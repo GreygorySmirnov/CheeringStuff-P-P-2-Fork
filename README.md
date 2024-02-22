@@ -1,1 +1,2 @@
-# CheeringStuff-P-P-2
+# CheeringStuff
+API - Backend seulement
