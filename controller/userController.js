@@ -221,6 +221,15 @@ exports.updateUser = (req, res) => {
       .json({ error: "Vous n'êtes pas autorisé à modifier ce profil." });
   }
 
+  // Vérifie le mot de passe actuel de l'utilisateur
+  User.findById(userIdToUpdate).then((user) => {
+    bcrypt.compare(req.body.currentPassword, user.password).then((isMatch) => {
+      if (!isMatch) {
+        return res.status(401).json({ error: "Mot de passe incorrect." });
+      }
+    });
+  });
+
   // Retire le champ isAdmin et cart du corps de la requête
   delete req.body.isAdmin;
   delete req.body.cart;
