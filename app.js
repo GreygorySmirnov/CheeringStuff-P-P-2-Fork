@@ -7,11 +7,76 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const imagesPath = path.join(__dirname, 'images');
+const ftp = require('ftp');
+const fs = require('fs');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
+
+// ======================================================
+// FTP CONNEXION (dependencies: node-ftp)
+// FTP Connexion à ftp.solusoft-erp.com
+const client = new ftp();
+const config = {
+  host: 'ftp.solusoft-erp.com',
+  port: 21,
+  user: 'Ricart@solusoft-erp.com',
+  password: 'ric2024art'
+};
+
+client.connect(config);
+
+
+// FTP Listing du contenu 
+client.on('ready', () => {
+  client.list((err, list) => {
+    if (err) throw err;
+    console.log('Listing du contenu des dossiers:');
+    console.dir(list);
+    client.end();
+  });
+});
+
+
+// FTP Téléchargement d'un fichier
+client.on('ready', () => {
+  client.list((err, list) => {
+    if (err) throw err;
+    console.log('Listing du contenu des dossiers:');
+    console.dir(list);
+
+    // FTP Téléchargement d'un fichier - Chemin vers le fichier produitTest.zip sur le serveur
+    const remoteFilePath = '/Produits/produitTest.zip';
+    // FTP Téléchargement d'un fichier - Chemin vers le fichier produitTest.zip sur local
+    const localFilePath = 'produitTest666.zip'; // Path where you want to save the downloaded file
+
+    // FTP GET - Méthode pour télécharger un fichier
+    client.get(remoteFilePath, (err, stream) => {
+      if (err) {
+        console.error('Error downloading file:', err);
+        return;
+      }
+
+      // FTP PIPE PROCESS - Stream du fichier Serveur vers Stream Local
+      stream.pipe(fs.createWriteStream(localFilePath));
+
+      // FTP CLOSE EVENT - Écoute de la terminaison du processus de téléchargement
+      stream.once('close', () => {
+        console.log('File downloaded successfully');
+        client.end(); // Close the FTP connection
+      });
+    });
+  });
+});
+
+// FTP Gestion des événements
+client.on('error', (err) => {
+  console.log('FTP error occurred: ' + err);
+});
+
+
 
 
 // Middleware pour ajouter les headers CORS
