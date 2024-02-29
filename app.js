@@ -103,7 +103,7 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD
     console.log('La connexion à la base de données a échoué', err);
   });
 
-// FTP CONNEXION (dependencies: node-ftp) - Connexion à ftp.solusoft-erp.com
+/*// FTP CONNEXION (dependencies: node-ftp) - Connexion à ftp.solusoft-erp.com
 const client = new ftp();
 const config = {
   host: 'ftp.solusoft-erp.com',
@@ -121,7 +121,7 @@ client.on('ready', () => {
     console.log('Vous êtes bien connecté au serveur FTP.');
     /*     console.log('Listing du contenu des dossiers:');
         console.dir(list); */
-    client.end();
+    /*client.end();
   });
 });
 
@@ -167,4 +167,4 @@ const zipFilePath = 'solusoft/compressedFiles/produitTest666.zip/';
 const zip = new AdmZip(zipFilePath);
 
 // Extrait le contenu du fichier compressé (produits)
-zip.extractAllTo('solusoft/uncompressedFiles', true);
+zip.extractAllTo('solusoft/uncompressedFiles', true);*/
