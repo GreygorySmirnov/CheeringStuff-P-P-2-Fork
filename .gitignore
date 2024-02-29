@@ -1,4 +1,5 @@
 node_modules/
 .env/
 .vscode/
-
+solusoft/compressedFiles
+solusoft/uncompressedFiles
