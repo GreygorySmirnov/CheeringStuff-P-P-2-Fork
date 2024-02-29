@@ -19,6 +19,9 @@ router.delete('/cart/:productId', authId, cartController.deleteFromCart);
 // Route pour créer un panier
 router.post('/cart', authId, cartController.addToCart); 
 
+// Route pour checkout
+router.post('/cart/checkout', authId, cartController.createCheckoutSession);
+
 
 // Exporte le router pour qu'il puisse être utilisé dans d'autres fichiers
 module.exports = router;

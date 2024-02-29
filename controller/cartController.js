@@ -130,3 +130,50 @@ exports.getCart = async (req, res) => {
     });
   }
 };
+
+
+
+
+exports.createCheckoutSession = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    
+    // Récupérer le panier de l'utilisateur depuis la base de données
+    const cart = await Cart.findOne({ userId });
+    if (!cart) {
+      return res.status(404).json({ message: "Panier non trouvé" });
+    }
+
+    // Construire les lignes d'articles pour la session de paiement
+    const lineItems = cart.itemsCart.map(item => {
+      return {
+        price_data: {
+          currency: 'usd',
+          product_data: {
+            name: item.product.name,
+      
+          },
+          unit_amount: item.product.price * 100, // Convertir le prix en centimes
+        },
+        quantity: item.quantity,
+      };
+    });
+
+    // Créer une session de paiement avec Stripe
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: 'https://example.com/success', // URL de redirection après le paiement réussi
+      cancel_url: 'https://example.com/cancel', // URL de redirection en cas d'annulation du paiement
+    });
+
+    res.status(200).json({ checkoutUrl: session.url });
+  } catch (error) {
+    console.error("Erreur lors de la création de la session de paiement :", error);
+    res.status(500).json({
+      message: "Une erreur s'est produite lors de la création de la session de paiement."
+    });
+  }
+};
+
