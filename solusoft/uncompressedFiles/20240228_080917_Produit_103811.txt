@@ -1,0 +1,35 @@
+[
+	{
+		"m_sIDPhotos":"2520",
+		"m_sEntite":"Produit",
+		"m_sIDProduit":"103811",
+		"m_sNomFichier":"103811_100",
+		"m_sFormat":"JPG",
+		"m_sDescFra":"Photo 100 fr",
+		"m_sDescAng":"Photo 100 an",
+		"m_sRangPhoto":"0",
+		"m_sASupprimerWeb":"0"
+	},
+	{
+		"m_sIDPhotos":"2521",
+		"m_sEntite":"Produit",
+		"m_sIDProduit":"103811",
+		"m_sNomFichier":"103811_80",
+		"m_sFormat":"JPG",
+		"m_sDescFra":"Photo 80 fr",
+		"m_sDescAng":"Photo 80 an",
+		"m_sRangPhoto":"0",
+		"m_sASupprimerWeb":"0"
+	},
+	{
+		"m_sIDPhotos":"2522",
+		"m_sEntite":"Produit",
+		"m_sIDProduit":"103811",
+		"m_sNomFichier":"103811_30",
+		"m_sFormat":"JPG",
+		"m_sDescFra":"Photo 30 fr",
+		"m_sDescAng":"Photo 30 an",
+		"m_sRangPhoto":"0",
+		"m_sASupprimerWeb":"0"
+	}
+]
