@@ -168,4 +168,3 @@ const zip = new AdmZip(zipFilePath);
 
 // Extrait le contenu du fichier compressé (produits)
 zip.extractAllTo('solusoft/uncompressedFiles', true);
-
