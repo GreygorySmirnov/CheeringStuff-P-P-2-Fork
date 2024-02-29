@@ -122,7 +122,7 @@ exports.getCart = async (req, res) => {
     }
 
     // Réponse avec le contenu du panier
-    res.status(200).json({ itemsCart: cart.itemsCart });
+    res.status(200).json({ cart });
   } catch (error) {
     console.error(error);
     res.status(500).json({
