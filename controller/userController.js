@@ -171,6 +171,9 @@ exports.getUserById = (req, res) => {
 
 // Fonction pour récupérer le profil de l'utilisateur authentifié
 exports.getUserProfil = (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Vous n'êtes pas autorisé à accéder à ce profil." });
+  }
   // Récupère l'identifiant de l'utilisateur authentifié
   const userId = req.user.userId;
 
@@ -209,6 +212,10 @@ exports.getUserProfil = (req, res) => {
 
 // Fonction pour mettre à jour le profil de l'utilisateur connecté
 exports.updateUser = (req, res) => {
+  // Retire le champ isAdmin et cart du corps de la requête
+  delete req.body.isAdmin;
+  delete req.body.cart;
+
   // Récupère l'id de l'utilisateur connecté
   const authenticatedUserId = req.user.userId;
   // Récupère l'id de l'utilisateur à mettre à jour depuis les paramètres de la requête
@@ -221,37 +228,56 @@ exports.updateUser = (req, res) => {
       .json({ error: "Vous n'êtes pas autorisé à modifier ce profil." });
   }
 
-  // Retire le champ isAdmin et cart du corps de la requête
-  delete req.body.isAdmin;
-  delete req.body.cart;
+  // Vérifie le mot de passe actuel de l'utilisateur
+  User.findById(userIdToUpdate).then((user) => {
+    bcrypt
+    // Compare le mot de passe actuel de l'utilisateur avec le mot de passe fourni
+      .compare(req.body.currentPassword, user.password)
+      .then((isMatch) => {
+        if (!isMatch) {
+          return res
+            .status(401)
+            .json({ error: "Le mot de passe actuel est incorrect." });
+        }
 
-  // Vérifier si un nouveau mot de passe est fourni
-  if (req.body.password) {
-    // Générer le hash du nouveau mot de passe avec bcrypt
-    bcrypt.hash(req.body.password, 10, (error, hash) => {
-      if (error) {
-        console.error(
-          "Erreur lors de la génération du hash du mot de passe :",
-          error
-        );
-        // Renvoi une réponse d'erreur en cas d'échec de la génération du hash
-        return res.status(500).json({
+        // Si un nouveau mot de passe est fourni, générer un hash pour le nouveau mot de passe
+        if (req.body.newPassword) {
+          // Générer le hash du nouveau mot de passe avec bcrypt
+          bcrypt.hash(req.body.newPassword, 10, (error, hash) => {
+            if (error) {
+              console.error(
+                "Erreur lors de la génération du hash du mot de passe :",
+                error
+              );
+              // Renvoi une réponse d'erreur en cas d'échec de la génération du hash
+              return res.status(500).json({
+                error:
+                  "Une erreur s'est produite lors de la mise à jour du profil de l'utilisateur.",
+              });
+            }
+      
+            // Remplace le mot de passe en clair par le hash dans req.body
+            req.body.password = hash;
+      
+            // Appel de la fonction pour mettre à jour le profil de l'utilisateur
+            updateUserProfil();
+          });
+        } else {
+          /* Si aucun nouveau mot de passe n'est fourni, appeler directement la fonction 
+          pour mettre à jour le profil de l'utilisateur */
+          updateUserProfil();
+        }
+      })
+      .catch((error) => {
+        // Gère les erreurs lors de la comparaison du mot de passe
+        console.error("Erreur lors de la comparaison du mot de passe :", error);
+        // Renvoi une réponse d'erreur en cas d'échec de la comparaison du mot de passe
+        res.status(500).json({
           error:
             "Une erreur s'est produite lors de la mise à jour du profil de l'utilisateur.",
         });
-      }
-
-      // Remplace le mot de passe en clair par le hash dans req.body
-      req.body.password = hash;
-
-      // Appel de la fonction pour mettre à jour le profil de l'utilisateur
-      updateUserProfil();
-    });
-  } else {
-    /* Si aucun nouveau mot de passe n'est fourni, appeler directement la fonction 
-    pour mettre à jour le profil de l'utilisateur */
-    updateUserProfil();
-  }
+      });
+  })
 
   // Fonction pour mettre à jour le profil de l'utilisateur
   function updateUserProfil() {
