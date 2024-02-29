@@ -171,6 +171,9 @@ exports.getUserById = (req, res) => {
 
 // Fonction pour récupérer le profil de l'utilisateur authentifié
 exports.getUserProfil = (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ error: "Vous n'êtes pas autorisé à accéder à ce profil." });
+  }
   // Récupère l'identifiant de l'utilisateur authentifié
   const userId = req.user.userId;
 
@@ -228,19 +231,19 @@ exports.updateUser = (req, res) => {
   // Vérifie le mot de passe actuel de l'utilisateur
   User.findById(userIdToUpdate).then((user) => {
     bcrypt
-      .compare(req.body.password, user.password)
+    // Compare le mot de passe actuel de l'utilisateur avec le mot de passe fourni
+      .compare(req.body.currentPassword, user.password)
       .then((isMatch) => {
         if (!isMatch) {
           return res
             .status(401)
             .json({ error: "Le mot de passe actuel est incorrect." });
         }
-        // Si le mot de passe actuel est correct, appeler la fonction pour mettre à jour le profil de l'utilisateur
-        //updateUserProfil();
 
-        if (req.body.password) {
+        // Si un nouveau mot de passe est fourni, générer un hash pour le nouveau mot de passe
+        if (req.body.newPassword) {
           // Générer le hash du nouveau mot de passe avec bcrypt
-          bcrypt.hash(req.body.password, 10, (error, hash) => {
+          bcrypt.hash(req.body.newPassword, 10, (error, hash) => {
             if (error) {
               console.error(
                 "Erreur lors de la génération du hash du mot de passe :",
