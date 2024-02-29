@@ -28,20 +28,11 @@ app.use(cors({
 // app.use((req, res, next) => {
 //   const allowedIPs = [
 //     '::1', // Localhost
-//     '24.201.81.165' , //Antoine Bergeron Public IP
-//     '64.228.23.191', // Raphael Doucet Public IP
-//     '24.201.110.120', // Nathan Thibault Public IP
-//     '70.52.74.125', // Andreann Poirier Public IP
+
 //     '69.4.211.26', // Sebastien Arseneault Public IP
-//     '184.162.183.82', // Daniel Lelievre Public IP 
 //     '184.162.235.220', // Hamza Arfaoui Public IP
 //     '184.145.194.159', // Toufik Dellys Public IP
-//     '206.167.109.133', // Cegep Garneau Public IP - Andreann Poirier
-//     '206.167.109.141', // Cegep Garneau Public IP - Daniel L-L
-//     '206.167.109.162', // Cegep Garneau Public IP - Antoine B.
-//     '206.167.109.231', // Cegep Garneau Public IP - Seb Ars.
-//     '206.167.109.159', // Cegep Garneau Public IP - Toufik D.
-//     '206.167.109.158', // Cegep Garneau Public IP - Hamza 
+
 //   ]; 
 
 //   const allowedIPPrefix = '206.167.109.';
@@ -78,6 +69,7 @@ const routesOrder = require('./routes/routesOrder');
 const routesCart = require('./routes/routesCart');
 const routesError = require('./routes/routesError');
 const routesSearch = require('./routes/routesSearch');
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 app.use(routesUser, routesProduct, routesSearch, routesCart, routesOrder, routesError);
 
@@ -86,7 +78,6 @@ app.use(routesUser, routesProduct, routesSearch, routesCart, routesOrder, routes
 const errorController = require('./controller/errorController');
 app.use(errorController.logErrors);
 app.use(errorController.get404);
-
 
 // Connexion à la base de données
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/${process.env.DB_NAME}?retryWrites=true&w=majority`)
