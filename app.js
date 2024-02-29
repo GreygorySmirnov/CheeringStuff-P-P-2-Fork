@@ -7,20 +7,22 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const imagesPath = path.join(__dirname, 'images');
+const ftp = require('ftp');
+const fs = require('fs');
+const AdmZip = require('adm-zip');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
-
 // Middleware pour ajouter les headers CORS
 const allowedOrigins = ['http://localhost:3000', 'https://api-cheeringstuff.onrender.com'];
 app.use(cors({
   origin: allowedOrigins,
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true, 
-  optionsSuccessStatus: 204, 
+  credentials: true,
+  optionsSuccessStatus: 204,
 }));
 
 
@@ -28,20 +30,11 @@ app.use(cors({
 // app.use((req, res, next) => {
 //   const allowedIPs = [
 //     '::1', // Localhost
-//     '24.201.81.165' , //Antoine Bergeron Public IP
-//     '64.228.23.191', // Raphael Doucet Public IP
-//     '24.201.110.120', // Nathan Thibault Public IP
-//     '70.52.74.125', // Andreann Poirier Public IP
+
 //     '69.4.211.26', // Sebastien Arseneault Public IP
-//     '184.162.183.82', // Daniel Lelievre Public IP 
 //     '184.162.235.220', // Hamza Arfaoui Public IP
 //     '184.145.194.159', // Toufik Dellys Public IP
-//     '206.167.109.133', // Cegep Garneau Public IP - Andreann Poirier
-//     '206.167.109.141', // Cegep Garneau Public IP - Daniel L-L
-//     '206.167.109.162', // Cegep Garneau Public IP - Antoine B.
-//     '206.167.109.231', // Cegep Garneau Public IP - Seb Ars.
-//     '206.167.109.159', // Cegep Garneau Public IP - Toufik D.
-//     '206.167.109.158', // Cegep Garneau Public IP - Hamza 
+
 //   ]; 
 
 //   const allowedIPPrefix = '206.167.109.';
@@ -78,6 +71,7 @@ const routesOrder = require('./routes/routesOrder');
 const routesCart = require('./routes/routesCart');
 const routesError = require('./routes/routesError');
 const routesSearch = require('./routes/routesSearch');
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 app.use(routesUser, routesProduct, routesSearch, routesCart, routesOrder, routesError);
 
@@ -88,7 +82,8 @@ app.use(errorController.logErrors);
 app.use(errorController.get404);
 
 
-// Connexion à la base de données
+// MONGODB -Connexion à la base de données
+
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/${process.env.DB_NAME}?retryWrites=true&w=majority`)
   .then(() => {
     console.log('La connexion à la base de données est établie, http://localhost:3030');
@@ -100,3 +95,69 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD
   .catch(err => {
     console.log('La connexion à la base de données a échoué', err);
   });
+
+// FTP CONNEXION (dependencies: node-ftp) - Connexion à ftp.solusoft-erp.com
+const client = new ftp();
+const config = {
+  host: 'ftp.solusoft-erp.com',
+  port: 21,
+  user: 'Ricart@solusoft-erp.com',
+  password: 'ric2024art'
+};
+
+client.connect(config);
+
+// FTP Vérification de la connexion + Listing du contenu
+client.on('ready', () => {
+  client.list((err, list) => {
+    if (err) throw err;
+    console.log('Vous êtes bien connecté au serveur FTP.');
+    /*     console.log('Listing du contenu des dossiers:');
+        console.dir(list); */
+    client.end();
+  });
+});
+
+
+// FTP Active l'écoute des événements et déclanche les callbacks.
+client.on('ready', () => {
+  client.list((err, list) => {
+    if (err) throw err;
+    // FTP Sélection du fichier à télécharger sur le serveuer - produitTest.zip (temporaire)
+    const remoteFilePath = '/Produits/produitTest.zip';
+    // FTP Destination du dossier/nom du fichier dans le dossier du projet (local)
+    const localFilePath = 'solusoft/compressedFiles/produitTest666.zip';
+
+    //GET - Méthode pour télécharger un fichier
+    client.get(remoteFilePath, (err, stream) => {
+      if (err) {
+        console.error('Error downloading file:', err);
+        return;
+      }
+
+      // FTP PIPE PROCESS - Stream du fichier Serveur vers Stream Local
+      stream.pipe(fs.createWriteStream(localFilePath));
+
+      // FTP CLOSE EVENT - Écoute de la terminaison du processus de téléchargement
+      stream.once('close', () => {
+        console.log('File downloaded successfully');
+        client.end(); // Close the FTP connection
+      });
+    });
+  });
+});
+
+// FTP Gestion des événements
+client.on('error', (err) => {
+  console.log('FTP error occurred: ' + err);
+});
+
+// ADM-ZIP - Gestionnaire de compression/décompression de fichier
+// ZIP - Chemin d'accès vers le fichier zip (produits)
+const zipFilePath = 'solusoft/compressedFiles/produitTest666.zip/';
+
+// Crée une instance d'AdmZip
+const zip = new AdmZip(zipFilePath);
+
+// Extrait le contenu du fichier compressé (produits)
+zip.extractAllTo('solusoft/uncompressedFiles', true);
