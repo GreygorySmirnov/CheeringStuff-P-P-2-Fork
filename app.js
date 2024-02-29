@@ -96,8 +96,8 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD
     console.log('La connexion à la base de données a échoué', err);
   });
 
-/*// FTP CONNEXION (dependencies: node-ftp) - Connexion à ftp.solusoft-erp.com
-const client = new ftp();
+// FTP CONNEXION (dependencies: node-ftp) - Connexion à ftp.solusoft-erp.com
+/*const client = new ftp();
 const config = {
   host: 'ftp.solusoft-erp.com',
   port: 21,
