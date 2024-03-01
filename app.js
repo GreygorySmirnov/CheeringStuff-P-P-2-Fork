@@ -64,7 +64,7 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD
   });
 
 // FTP CONNEXION (dependencies: node-ftp) - Connexion à ftp.solusoft-erp.com
-/*const client = new ftp();
+const client = new ftp();
 const config = {
   host: 'ftp.solusoft-erp.com',
   port: 21,
@@ -79,9 +79,9 @@ client.on('ready', () => {
   client.list((err, list) => {
     if (err) throw err;
     console.log('Vous êtes bien connecté au serveur FTP.');
-    /*     console.log('Listing du contenu des dossiers:');
-        console.dir(list); */
-    /*client.end();
+         console.log('Listing du contenu des dossiers:');
+        console.dir(list); 
+    client.end();
   });
 });
 
