@@ -19,14 +19,14 @@ try {
 }
 
 // FTP - Importation  des commandes
-const order = require("./models/orders"); //
+const Order = require("./models/orders"); //
 //const Client = require('ftp');
 
 // Fonction pour importer les commandes depuis MongoDB et les convertir en fichiers JSON.
 const importOrders = async () => {
   try {
     // Récupérer toutes les commandes de la base de données MongoDB
-    const orders = await order.find();
+    const orders = await Order.find();
 
     // Parcourir les commandes et les convertir en fichiers JSON
     for (const order of orders) {
