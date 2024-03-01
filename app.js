@@ -25,50 +25,10 @@ app.use(cors({
   optionsSuccessStatus: 204,
 }));
 
-
-// // Middleware pour vérifier l'adresse IP avant de traiter les requêtes
-// app.use((req, res, next) => {
-//   const allowedIPs = [
-//     '::1', // Localhost
-//     '24.201.81.165' , //Antoine Bergeron Public IP
-//     '64.228.23.191', // Raphael Doucet Public IP
-//     '24.201.110.120', // Nathan Thibault Public IP
-//     '70.52.74.125', // Andreann Poirier Public IP
-//     '69.4.211.26', // Sebastien Arseneault Public IP
-//     '184.162.183.82', // Daniel Lelievre Public IP 
-//     '184.162.235.220', // Hamza Arfaoui Public IP
-//     '184.145.194.159', // Toufik Dellys Public IP
-//     '206.167.109.133', // Cegep Garneau Public IP - Andreann Poirier
-//     '206.167.109.141', // Cegep Garneau Public IP - Daniel L-L
-//     '206.167.109.162', // Cegep Garneau Public IP - Antoine B.
-//     '206.167.109.231', // Cegep Garneau Public IP - Seb Ars.
-//     '206.167.109.159', // Cegep Garneau Public IP - Toufik D.
-//     '206.167.109.158', // Cegep Garneau Public IP - Hamza 
-//   ]; 
-
-//   const allowedIPPrefix = '206.167.109.';
-
-//   // Use the x-forwarded-for header if present
-//   const forwardedFor = req.headers['x-forwarded-for'];
-//   const clientIP = forwardedFor ? forwardedFor.split(',')[0] : req.socket.remoteAddress;
-
-//   console.log('Client IP:', clientIP);
-
-//   if (clientIP.startsWith(allowedIPPrefix) || allowedIPs.includes(clientIP)) {
-//     // The IP address is allowed, continue with the processing
-//     next();
-//   } else {
-//     // The IP address is not allowed, send a 403 forbidden response
-//     res.status(403).send('Accès interdit maudit hacker!');
-//   }
-// });
-
-
 // Vos routes et le reste de votre configuration
 app.get('/', (req, res) => {
   res.send('Bienvenue sur votre API sécurisée.');
 });
-
 
 // Servir les images statiques depuis le dossier 'images'
 app.use('/images', express.static(imagesPath));
@@ -83,12 +43,10 @@ const routesSearch = require('./routes/routesSearch');
 
 app.use(routesUser, routesProduct, routesSearch, routesCart, routesOrder, routesError);
 
-
 // Gestions des erreurs
 const errorController = require('./controller/errorController');
 app.use(errorController.logErrors);
 app.use(errorController.get404);
-
 
 // MONGODB -Connexion à la base de données
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/${process.env.DB_NAME}?retryWrites=true&w=majority`)
@@ -125,7 +83,6 @@ client.on('ready', () => {
   });
 });
 
-
 // FTP Active l'écoute des événements et déclanche les callbacks.
 client.on('ready', () => {
   client.list((err, list) => {
@@ -161,10 +118,84 @@ client.on('error', (err) => {
 
 // ADM-ZIP - Gestionnaire de compression/décompression de fichier
 // ZIP - Chemin d'accès vers le fichier zip (produits)
-const zipFilePath = 'solusoft/compressedFiles/produitTest666.zip/';
+const zipFilePath = 'solusoft/compressedFiles/produitTest666.zip';
 
-// Crée une instance d'AdmZip
-const zip = new AdmZip(zipFilePath);
+  try {
+  const zip = new AdmZip(zipFilePath);
+  zip.extractAllTo('solusoft/uncompressedFiles', true);
+} catch (err) {
+if (err.message.includes('Aucun en-tête END trouvé')) {
+    console.error('Erreur : Format ZIP invalide ou non pris en charge. Le fichier est peut-être corrompu.');
+  } else {
+    console.error('Erreur inattendue lors de lextraction ZIP :', err);
+  }
+} 
 
-// Extrait le contenu du fichier compressé (produits)
-zip.extractAllTo('solusoft/uncompressedFiles', true);
+// FTP - Importation  des commandes
+const Order = require('./models/orders'); // 
+//const Client = require('ftp');
+
+// Fonction pour importer les commandes depuis MongoDB et les convertir en fichiers JSON.
+const importOrders = async () => {
+  try {
+    // Récupérer toutes les commandes de la base de données MongoDB
+    const orders = await Order.find();
+
+    // Parcourir les commandes et les convertir en fichiers JSON
+    for (const order of orders) {
+      const orderJSON = orderToJSON(order);
+      const fileName = `commande-${order._id}.json`;
+      const filePath = `solusoft/orders/${fileName}`;
+
+      // Ecrire le fichier JSON dans le dossier 'solusoft/orders'
+      fs.writeFileSync(filePath, orderJSON);
+    }
+    // Créer un fichier dans le dossier 'orders'
+const createFileInOrdersFolder = () => {
+  try {
+    // Nom du fichier à créer
+    const fileName = 'nouveau-fichier.txt';
+
+    // Chemin complet du fichier à créer
+    const filePath = path.join(__dirname, 'solusoft', 'orders', fileName);
+
+    // Contenu du fichier
+    const fileContent = 'Contenu du nouveau fichier.';
+
+    // Créer le fichier avec le contenu spécifié
+    fs.writeFileSync(filePath, fileContent);
+
+    console.log(`Le fichier ${fileName} a été créé avec succès dans le dossier 'orders'.`);
+  } catch (error) {
+    console.error('Une erreur est survenue lors de la création du fichier :', error);
+  }
+};
+// Appeler la fonction pour créer le fichier dans le dossier 'orders'
+createFileInOrdersFolder();
+
+    // Se connecter au serveur FTP
+    client.connect(config);
+    // Fonction pour gérer les erreurs
+function handleError(error) {
+  console.error('Une erreur est survenue :', error);
+  client.end(); // Fermer la connexion FTP en cas d'erreur
+}
+   
+  } catch (error) {
+    console.error('Une erreur est survenue lors de l\'importation des commandes :', error);
+  } 
+  client.end();
+};
+
+// Fonction pour convertir une commande en fichier JSON
+const orderToJSON = (order) => {
+  const orderData = {
+    _id: order._id,
+    userId: order.userId,
+    itemsCart: order.itemsCart,
+  };
+  return JSON.stringify(orderData);
+};
+
+// Démarrer l'importation des commandes
+importOrders();
