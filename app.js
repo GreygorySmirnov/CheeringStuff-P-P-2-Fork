@@ -40,6 +40,7 @@ const routesOrder = require('./routes/routesOrder');
 const routesCart = require('./routes/routesCart');
 const routesError = require('./routes/routesError');
 const routesSearch = require('./routes/routesSearch');
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 app.use(routesUser, routesProduct, routesSearch, routesCart, routesOrder, routesError);
 
@@ -49,6 +50,7 @@ app.use(errorController.logErrors);
 app.use(errorController.get404);
 
 // MONGODB -Connexion à la base de données
+
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/${process.env.DB_NAME}?retryWrites=true&w=majority`)
   .then(() => {
     console.log('La connexion à la base de données est établie, http://localhost:3030');
@@ -62,7 +64,7 @@ mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD
   });
 
 // FTP CONNEXION (dependencies: node-ftp) - Connexion à ftp.solusoft-erp.com
-const client = new ftp();
+/*const client = new ftp();
 const config = {
   host: 'ftp.solusoft-erp.com',
   port: 21,
@@ -79,7 +81,7 @@ client.on('ready', () => {
     console.log('Vous êtes bien connecté au serveur FTP.');
     /*     console.log('Listing du contenu des dossiers:');
         console.dir(list); */
-    client.end();
+    /*client.end();
   });
 });
 
