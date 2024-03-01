@@ -116,7 +116,6 @@ client.on('error', (err) => {
   console.log('FTP error occurred: ' + err);
 });
 
-// ADM-ZIP - Gestionnaire de compression/décompression de fichier
 // ZIP - Chemin d'accès vers le fichier zip (produits)
 const zipFilePath = 'solusoft/compressedFiles/produitTest666.zip';
 
