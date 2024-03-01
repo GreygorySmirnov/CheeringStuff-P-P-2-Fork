@@ -10,7 +10,7 @@ exports.ftpConnect = (req, res) => {
     //Référence: https://crontab.guru/#0_*/1_*_*_*
 
     cron.schedule('* * * * *', function () {
-        console.log('Exécution du script pour télécharger le fichier');
+        console.log('*Mode TEST: Exécution du script pour télécharger le fichier (toute les minutes)');
 
         const ftp = require('ftp');
         const fs = require('fs');
