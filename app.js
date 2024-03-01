@@ -71,7 +71,6 @@ const routesOrder = require('./routes/routesOrder');
 const routesCart = require('./routes/routesCart');
 const routesError = require('./routes/routesError');
 const routesSearch = require('./routes/routesSearch');
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 app.use(routesUser, routesProduct, routesSearch, routesCart, routesOrder, routesError);
 
