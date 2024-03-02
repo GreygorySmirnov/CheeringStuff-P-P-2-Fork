@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const imagesPath = path.join(__dirname, 'images');
-const cronScriptFtp = require('./script/cronScriptFtp');
+const cronScriptFtp = require('./script/cronScriptFtp')
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
