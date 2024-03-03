@@ -2,148 +2,105 @@
 exports.ftpGet = async (req, res) => {
 
     // MODULES DE DÉPENDANCES (intégration): Librairies FTP, Gestionnaire de fichier FS, Gerstionnaire de décompression AdmZip)
-    const ftp = require('ftp');
-    const fs = require('fs');
-    const AdmZip = require('adm-zip');
-    const path = require('path');
-    const remoteDirPath = '/Produits/a_traiter'; // Dossier distant à téléchargé
-    const localDirPath = 'solusoft/compressedFiles/'; // Dossier local sélectionné
-
-    // NEW solusoftFTP solusoftFTP: Création d'une nouvelle instance de connexion au solusoftFTP "ftp.solusoft-erp.com" (dependencies: node-ftp): (+ Création des sous-dossiers Solusoft + Décompression des fichiers)
-    const solusoftFTP = new ftp();
-    // Détails de connexion au FTP (login)
-    const solusoftDetails = {
-        host: 'ftp.solusoft-erp.com',
-        port: 21,
-        user: 'Ricart@solusoft-erp.com',
-        password: 'ric2024art'
-    };
-    // CONNEXION AU solusoftFTP solusoft-erp à l'aide de l'objet solusoftDetails (host, port, user, password)
-    solusoftFTP.connect(solusoftDetails);
-
-    // FTP solusoftFTP ON: Active l'écoute des événements et déclanche les callbacks.
-    solusoftFTP.on('ready', () => {
-        solusoftFTP.list((err, list) => {
-            if (err) throw err;
+    const basicFtp = require('basic-ftp'); // Module Gestionnaire d'interactions avec le serveur FTP
+    const fs = require('fs'); // Module Gestionnaire de fichiers/(File System)
+    const zipController = require('../controller/zipController');
 
 
-            /* 
-            // CRÉATION DES DOSSIERS DE TÉLÉCHARGEMENTS LOCAUX (solusoft/compressedFiles + solusoft/uncompressedFiles)
-            // Vérification SI dossier "solusoft/compressedFiles" existe déjà, sinon le créé.
-            fs.access("solusoft/compressedFiles", fs.constants.F_OK, (err) => {
-                if (err) {
-                    // Si dossier "solusoft/compressedFiles" n'existe pas, le créé
-                    fs.mkdir("solusoft/compressedFiles", { recursive: true }, (err) => {
-                        if (err) {
-                            console.error('Erreur de création du dossier "solusoft/compressedFiles":', err);
-                        } else {
-                            console.log('Dossier "solusoft/compressedFiles" créé avec succès"');
-                        }
-                    });
-                } else {
-                    console.log('Le dossier "solusoft/compressedFiles" existe déjà');
-                }
+    async function downloadRemoteFtpFiles() {
+        // CRÉATION INSTANCE CLIENT: connexion au client
+        const solusoftFTP = new basicFtp.Client();
+
+        try {
+            // FTP ACCÈS - Connexion au serveur FTP
+            await solusoftFTP.access({
+                host: 'ftp.solusoft-erp.com',
+                user: 'Ricart@solusoft-erp.com',
+                password: 'ric2024art',
             });
-            // Vérification SI dossier "solusoft/uncompressedFiles" existe déjà, sinon le créé.
-            fs.access("solusoft/uncompressedFiles", fs.constants.F_OK, (err) => {
-                if (err) {
-                    // Si dossier "solusoft/uncompressedFiles" n'existe pas, le créé
-                    fs.mkdir("solusoft/uncompressedFiles", { recursive: true }, (err) => {
-                        if (err) {
-                            console.error('Erreur de création du dossier "solusoft/uncompressedFiles":', err);
-                        } else {
-                            console.log('Dossier "solusoft/uncompressedFiles" créé avec succès"');
-                        }
-                    });
-                } else {
-                    console.log('Le dossier "solusoft/uncompressedFiles" existe déjà');
+
+            // EMPLACEMENT DES DOSSIERS DISTANTS À TÉLÉCHARGER DU SERVEUR FTP (produits et photos à traiter)
+            const remoteProductsDir = '/Produits/A traiter';
+            const remotePhotosDir = '/Photos/A traiter';
+            // EMPLACEMENT DES DOSSIERS LOCAUX POUR LA RÉCEPTION (produits et photos à traiter)
+            const localReceivedFilesProduits = 'solusoft/ftpReceivedFiles/Produits';
+            const localReceivedFilesPhotos = 'solusoft/ftpReceivedFiles/Photos';
+
+            if (!fs.existsSync(localReceivedFilesProduits)) {
+                // CRÉATION DU DOSSIER "PRODUITS" LOCAL si il n'existe pas déjà
+                fs.mkdirSync(localReceivedFilesProduits, { recursive: true });
+                console.log("Le dossier local 'ftpReceivedFiles/Produits' a été créé.");
+            } else {
+                console.log("Le dossier local 'ftpReceivedFiles/Produits' existe déjà.");
+            }
+
+            if (!fs.existsSync(localReceivedFilesPhotos)) {
+                // CRÉATION DU DOSSIER "PHOTOS" LOCAL si il n'existe pas déjà
+                fs.mkdirSync(localReceivedFilesPhotos, { recursive: true });
+                console.log("Le dossier local 'ftpReceivedFiles/Photos' a été créé.");
+            } else {
+                console.log("Le dossier local 'ftpReceivedFiles/Photos' existe déjà.");
+            }
+
+            // CRÉATION DE LA LISTE DES FICHIERS PRODUITS contenus dans le dossiers Produits à traiter du serveur FTP
+            try {
+                const productFilesList = await solusoftFTP.list(remoteProductsDir);
+
+
+                // TÉLÉCHARGEMENT DES PRODUITS (dossier '/Produits/A traiter' du serveur FTP)
+                for (const productFile of productFilesList) {
+                    if (productFile.isDirectory) {
+                        continue; // Ignorer les répertoires
+                    }
+
+                    // CHEMIN D'ACCÈS DISTANT AUX PRODUITS (dossier + nom du fichier sur le serveur FTP)
+                    const remoteProductsPath = `${remoteProductsDir}/${productFile.name}`;
+                    // CHEMIN D'ACCÈS LOCAL AUX PRODUITS (dossier + nom du fichier)
+                    const localProductsPath = `solusoft/ftpReceivedFiles/Produits/${productFile.name}`;
+
+                    // TÉLÉCHARGEMENT DES PRODUITS CIBLÉS (lisaison Serveur vers Local)
+                    await solusoftFTP.downloadTo(localProductsPath, remoteProductsPath);
                 }
-            }); */
+
+                console.log('Les produits ont été téléchargé avec succès!');
+            } catch (error) {
+                console.log("Erreur lors du téléchargement du dossier des produits")
+            }
+
+            // CRÉATION DE LA LISTE DES FICHIERS PHOTOS contenues dans le dossier Photos à traiter du serveur FTP
+            try {
+                const photoFilesList = await solusoftFTP.list(remotePhotosDir);
 
 
+                // TÉLÉCHARGEMENT DES PHOTOS (dossier '/Photos/A traiter' du serveur FTP)
+                for (const photoFiles of photoFilesList) {
+                    if (photoFiles.isDirectory) {
+                        continue; // Ignorer les répertoires
+                    }
 
+                    // CHEMIN D'ACCÈS DISTANT AUX PHOTOS (dossier + nom du fichier sur le serveur FTP)
+                    const remotePhotosPath = `${remotePhotosDir}/${photoFiles.name}`;
+                    // CHEMIN D'ACCÈS LOCAL AUX PHOTOS (dossier + nom du fichier)
+                    const localPhotosPath = `solusoft/ftpReceivedFiles/Photos/${photoFiles.name}`;
 
-            // Créé le chemin d'accès vers la destination locale du WriteStream
-            const pathName = 'solusoft/compressedFiles/downloadedFile.zip';
-            // FTP Sélection du fichier à télécharger sur le serveur - produitTest.zip (temporaire)
-            const remoteFilePath = '/Produits/produitTest.zip'; // Fichier sur le FTP
-
-
-
-            //GET 1 FILE - Méthode pour télécharger un fichier (remoteFilePath)
-            solusoftFTP.get(remoteFilePath, (err, stream) => {
-                if (err) {
-                    console.error('Error downloading file:', err);
-                    return;
+                    // TÉLÉCHARGEMENT DES PHOTOS CIBLÉES (lisaison Serveur vers Local)
+                    await solusoftFTP.downloadTo(localPhotosPath, remotePhotosPath);
                 }
-                // FTP PIPE PROCESS - WriteStream du fichier Serveur vers Stream Local
-                stream.pipe(fs.createWriteStream(pathName));
-                // FTP CLOSE EVENT - Écoute de la terminaison du processus de téléchargement
-                stream.once('close', () => {
-                    console.log('fichier "downloadedFile.zip" téléchargé avec succès');
-                    solusoftFTP.end(); // Close the FTP connection
 
-                    // ADM-ZIP - Gestionnaire de compression/décompression de fichier
-                    // ZIP - Chemin d'accès vers le fichier zip (produits)
-                    const zipFilePath = 'solusoft/compressedFiles/downloadedFile.zip';
-
-                    // Crée une instance d'AdmZip
-                    const zip = new AdmZip(zipFilePath);
-
-                    // Extrait le contenu du fichier compressé (produits)
-                    zip.extractAllTo('solusoft/uncompressedFiles', true);
-
-                });
-            });
-        });
-    });
-
-
-
-    // TEST ICI !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-    // Connecter au serveur FTP
-    solusoftFTP.on('ready', function () {
-        downloadDirectory(remoteDirPath, localDirPath);
-    });
-
-    
-    function downloadDirectory(remoteDirPath, localDirPath) {
-        solusoftFTP.list(remoteDirPath, function (err, list) {
-            if (err) throw err;
-
-            list.forEach(function (getProduit) {
-                const remoteFilePath = path.join(remoteDirPath, getProduit.name);
-                const localFilePath = path.join(localDirPath, getProduit.name);
-                console.log("DOSSIER FTP REMOTE: " + remoteFilePath)
-                console.log(localFilePath)
-
-                if (getProduit.type === 'd') { // Dossier
-                    fs.mkdirSync(localFilePath, { recursive: true });
-                    downloadDirectory(remoteFilePath, localFilePath);
-                } else { // Fichier
-                    solusoftFTP.get(remoteFilePath, function (err, stream) {
-                        if (err) throw err;
-                        stream.once('close', function () { client.end(); });
-                        stream.pipe(fs.createWriteStream(localFilePath));
-                    });
-                }
-            });
-        });
+                console.log('Les photos ont été téléchargé avec succès!');
+            } catch (error) {
+                console.log("Erreur lors du téléchargement des dossiers photos")
+            }
+        } catch (error) {
+            console.error('Erreur lors de la connexion au serveur FTP', error);
+        } finally {
+            // FERME LA CONNEXION FTP au serveur Solusoft
+            solusoftFTP.close();
+        }
+        zipController.extractZipFiles();
     }
 
-    // TEST FIN ICI!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-
-
-
-    // FTP Gestion des événements
-    solusoftFTP.on('error', (err) => {
-        console.log('Une erreur est survenue: ' + err);
-    })
+    // APPEL de la fonction de téléchargement du dossier
+    downloadRemoteFtpFiles();
+    
 }
-/* 
-// Exporter la fonction ftpGet
-module.exports = ftpGet;
- */

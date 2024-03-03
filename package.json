@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "adm-zip": "0.5.10",
+    "basic-ftp": "^5.0.5",
     "bcrypt": "5.1.0",
     "cors": "2.8.5",
     "crypto": "1.0.1",

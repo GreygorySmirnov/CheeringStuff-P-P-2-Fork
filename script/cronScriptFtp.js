@@ -6,10 +6,10 @@ exports.ftpConnect = (req, res) => {
 
     // Importer le script ftpGetController pour accéder à la fonction ftpGet.js
     const ftpGetController = require('../controller/ftpGetController');
-
+    
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // CRON - Exécution du script cron - CRON *OFF* (Référence: https://crontab.guru/#0_*/1_*_*_*)
+    // CRON START - Exécution du script cron - CRON *OFF* (Référence: https://crontab.guru/#0_*/1_*_*_*)
     // MODE TEST: exécution toute les minute: Remplacer: * * * * * par: 0 */1 * * *)
     /* 
         cron.schedule('* * * * *', function () {
@@ -17,10 +17,11 @@ exports.ftpConnect = (req, res) => {
     */
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    // Appeler la fonction ftpGet
-    ftpGetController.ftpGet(); // Appeler la fonction ftpGet (dans ftpGetController)
+    // APPEL LA FONCTION FTP GET
+    ftpGetController.ftpGet();
+    
 
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // CRON END !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     /*     
     })
     */
