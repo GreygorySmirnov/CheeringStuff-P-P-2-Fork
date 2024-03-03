@@ -23,9 +23,18 @@ exports.ftpGet = async (req, res) => {
             const remoteProductsDir = '/Produits/A traiter';
             const remotePhotosDir = '/Photos/A traiter';
             // EMPLACEMENT DES DOSSIERS LOCAUX POUR LA RÉCEPTION (produits et photos à traiter)
+            const solusoftFolder = 'solusoft';
             const localReceivedFilesProduits = 'solusoft/ftpReceivedFiles/Produits';
             const localReceivedFilesPhotos = 'solusoft/ftpReceivedFiles/Photos';
 
+            if (!fs.existsSync(solusoftFolder)) {
+                // CRÉATION DU DOSSIER "PRODUITS" LOCAL si il n'existe pas déjà
+                fs.mkdirSync(solusoftFolder, { recursive: true });
+                console.log("Le dossier local 'solusoftFolder' a été créé.");
+            } else {
+                console.log("Le dossier local 'solusoftFolder' existe déjà.");
+            }
+            
             if (!fs.existsSync(localReceivedFilesProduits)) {
                 // CRÉATION DU DOSSIER "PRODUITS" LOCAL si il n'existe pas déjà
                 fs.mkdirSync(localReceivedFilesProduits, { recursive: true });

@@ -1,0 +1,80 @@
+[
+	{
+		"m_eIDProduit":5034,
+		"m_sNoProduit":"104534                                       ",
+		"m_sCodeTrans":"A",
+		"m_sDescFra":"Borne-Fontaine Porcelaine",
+		"m_sDescAng":"2 1 \/ 2\"  Porcelain Fire Hydrant",
+		"m_sTypeProduit":"2",
+		"m_eIDProdModele":5034,
+		"m_sCodeCat":"RCART",
+		"m_sDescFraCat":"Ric'Art - Souvenir",
+		"m_sDescAngCat":"",
+		"m_sCodeSousCat":"     ",
+		"m_sDescSsFraCat":"",
+		"m_sDescSsAngCat":"",
+		"m_bTaxableTPS":true,
+		"m_bTaxableTVQ":true,
+		"m_mPrix":2.75,
+		"m_mPrixEnSolde":0,
+		"m_mQuantite":-1,
+		"m_nPoids":0,
+		"m_sNoteTechFra":"",
+		"m_sNoteTechAng":"",
+		"m_tbCategories":
+		[
+
+		],
+		"m_tbSpecifications":
+		[
+
+		],
+		"m_tbGroupe":
+		[
+
+		],
+		"m_tbCaracteristiques":
+		[
+			{
+				"m_eIDCritereParent":1,
+				"m_tbCriteres":
+				[
+					{
+						"m_eIDCritere":1,
+						"m_sDescFra":"Possibilit\u00e9s",
+						"m_sDescAng":"Possibilit\u00e9s",
+						"m_eOrdreAffich":0,
+						"m_sCodeCritere":""
+					},
+					{
+						"m_eIDCritere":3,
+						"m_sDescFra":"Article avec \u00e9cusson",
+						"m_sDescAng":"Item with crest",
+						"m_eOrdreAffich":0,
+						"m_sCodeCritere":""
+					}
+				]
+			},
+			{
+				"m_eIDCritereParent":5,
+				"m_tbCriteres":
+				[
+					{
+						"m_eIDCritere":5,
+						"m_sDescFra":"Cat\u00e9gories",
+						"m_sDescAng":"Cat\u00e9gories",
+						"m_eOrdreAffich":0,
+						"m_sCodeCritere":""
+					},
+					{
+						"m_eIDCritere":215,
+						"m_sDescFra":"Souvenirs & Cadeaux",
+						"m_sDescAng":"Souvenirs & Gifts",
+						"m_eOrdreAffich":0,
+						"m_sCodeCritere":""
+					}
+				]
+			}
+		]
+	}
+]
