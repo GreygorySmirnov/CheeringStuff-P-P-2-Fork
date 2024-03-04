@@ -7,7 +7,6 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const imagesPath = path.join(__dirname, 'images');
-const ftp = require('ftp');
 const fs = require('fs');
 const AdmZip = require('adm-zip');const cronScriptFtp = require('./script/cronScriptFtp')
 
