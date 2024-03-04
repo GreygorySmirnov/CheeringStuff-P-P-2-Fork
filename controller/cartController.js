@@ -154,22 +154,24 @@ exports.createCheckoutSession = async (req, res) => {
     }
 
     // Construire les lignes d'articles pour la session de paiement
-    const lineItems = []
+    const lineItems = [];
     for (const item of cart.itemsCart) {
       const product = await Product.findById(item.product);
       if (!product) {
         return res.status(404).json({ message: "Produit introuvable." });
       }
-    
+
       // Vérifier si la propriété PRIX4 existe et contient une valeur numérique
       if (!product.PRIX4 || isNaN(product.PRIX4)) {
         console.error(`Prix invalide pour le produit ${product.name}`);
-        return res.status(400).json({ message: "Prix invalide pour le produit" });
+        return res
+          .status(400)
+          .json({ message: "Prix invalide pour le produit" });
       }
-    
+
       lineItems.push({
         price_data: {
-          currency: "usd",
+          currency: "cad",
           product_data: {
             name: product.DESCFRA,
           },
@@ -178,8 +180,6 @@ exports.createCheckoutSession = async (req, res) => {
         quantity: item.quantity,
       });
     }
-    
-   
 
     // Vérifier si des articles valides ont été trouvés
     if (lineItems.length === 0) {
