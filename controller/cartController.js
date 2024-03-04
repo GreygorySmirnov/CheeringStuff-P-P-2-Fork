@@ -147,32 +147,39 @@ exports.createCheckoutSession = async (req, res) => {
     }
 
     // Vérifier si le panier contient des articles
-    if (!cart.itemsCart || cart.itemsCart.length === 0) {
+    if (cart.itemsCart.length === 0) {
       return res
         .status(400)
         .json({ message: "Le panier de l'utilisateur est vide." });
     }
 
     // Construire les lignes d'articles pour la session de paiement
-    const lineItems = cart.itemsCart
-      .map((item) => {
-        // Vérifiez si le prix du produit est valide
-        if (!item.product.price || isNaN(item.product.price)) {
-          console.error(`Prix invalide pour le produit ${item.product.name}`);
-          return null; // Ne pas inclure cette ligne d'article dans la session de paiement
-        }
-        return {
-          price_data: {
-            currency: "usd",
-            product_data: {
-              name: item.product.name,
-            },
-            unit_amount: item.product.price * 100, // Convertir le prix en centimes
+    const lineItems = []
+    for (const item of cart.itemsCart) {
+      const product = await Product.findById(item.product);
+      if (!product) {
+        return res.status(404).json({ message: "Produit introuvable." });
+      }
+    
+      // Vérifier si la propriété PRIX4 existe et contient une valeur numérique
+      if (!product.PRIX4 || isNaN(product.PRIX4)) {
+        console.error(`Prix invalide pour le produit ${product.name}`);
+        return res.status(400).json({ message: "Prix invalide pour le produit" });
+      }
+    
+      lineItems.push({
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: product.DESCFRA,
           },
-          quantity: item.quantity,
-        };
-      })
-      .filter(Boolean); // Supprimer les lignes d'articles nulles
+          unit_amount: product.PRIX4 * 100, // Convertir le prix en centimes
+        },
+        quantity: item.quantity,
+      });
+    }
+    
+   
 
     // Vérifier si des articles valides ont été trouvés
     if (lineItems.length === 0) {
