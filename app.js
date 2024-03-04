@@ -60,7 +60,23 @@ app.use(errorController.logErrors);
 app.use(errorController.get404);
 
 // CRONSCRIPT Exécution du script cronScriptFtp (planification de tâches) - ftpConnect appelle ensuite ftpGetController et zipController (téléchargement et décompression des produits)
-cronScriptFtp.ftpCronConnect();
+
+// AJOUTER TRY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// AJOUTER TRY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// AJOUTER TRY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// AJOUTER TRY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// AJOUTER TRY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+/* 
+try {
+  cronScriptFtp
+    .ftpCronConnect(
+    }
+    .catch ((err) => {
+  console.log("La connexion au serveur FTP a échoué", err);
+})
+ */
+
+cronScriptFtp.ftpCronConnect()
 
 // MONGODB -Connexion à la base de données
 
