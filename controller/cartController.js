@@ -3,6 +3,7 @@
 const User = require("../models/users");
 const Product = require("../models/products");
 const Cart = require("../models/carts");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 // Méthode pour ajouter un produit dans le panier de l'utilisateur connecté et créer simultanément son panier
 exports.addToCart = async (req, res) => {
@@ -127,6 +128,84 @@ exports.getCart = async (req, res) => {
     console.error(error);
     res.status(500).json({
       message: "Erreur lors de la récupération du panier de l'utilisateur",
+    });
+  }
+};
+
+exports.createCheckoutSession = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+
+    // Récupérer le panier de l'utilisateur depuis la base de données
+    const cart = await Cart.findOne({ userId });
+
+    // Vérifier si un panier a été trouvé
+    if (!cart) {
+      return res
+        .status(404)
+        .json({ message: "Panier non trouvé pour cet utilisateur." });
+    }
+
+    // Vérifier si le panier contient des articles
+    if (cart.itemsCart.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Le panier de l'utilisateur est vide." });
+    }
+
+    // Construire les lignes d'articles pour la session de paiement
+    const lineItems = [];
+    for (const item of cart.itemsCart) {
+      const product = await Product.findById(item.product);
+      if (!product) {
+        return res.status(404).json({ message: "Produit introuvable." });
+      }
+
+      // Vérifier si la propriété PRIX4 existe et contient une valeur numérique
+      if (!product.PRIX4 || isNaN(product.PRIX4)) {
+        console.error(`Prix invalide pour le produit ${product.name}`);
+        return res
+          .status(400)
+          .json({ message: "Prix invalide pour le produit" });
+      }
+
+      lineItems.push({
+        price_data: {
+          currency: "cad",
+          product_data: {
+            name: product.DESCFRA,
+          },
+          unit_amount: product.PRIX4 * 100, // Convertir le prix en centimes
+        },
+        quantity: item.quantity,
+      });
+    }
+
+    // Vérifier si des articles valides ont été trouvés
+    if (lineItems.length === 0) {
+      return res
+        .status(400)
+        .json({ message: "Aucun article valide trouvé dans le panier." });
+    }
+
+    // Créer une session de paiement avec Stripe
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: lineItems,
+      mode: "payment",
+      success_url: "https://example.com/success", // URL de redirection après le paiement réussi
+      cancel_url: "https://example.com/cancel", // URL de redirection en cas d'annulation du paiement
+    });
+
+    res.status(200).json({ checkoutUrl: session.url });
+  } catch (error) {
+    console.error(
+      "Erreur lors de la création de la session de paiement :",
+      error
+    );
+    res.status(500).json({
+      message:
+        "Une erreur s'est produite lors de la création de la session de paiement.",
     });
   }
 };
