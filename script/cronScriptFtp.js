@@ -1,5 +1,5 @@
 // Function FTP Connexion / Download / Download
-exports.ftpConnect = (req, res) => {
+exports.ftpCronConnect = (req, res) => {
 
     // MODULES DE DÉPENDANCES (inclusion): Planificateur CRON, Librairie FTP, Gestionnaire de fichier FS, Gestionnaire de téléchargement AdmZip
     const cron = require('node-cron');
@@ -17,8 +17,9 @@ exports.ftpConnect = (req, res) => {
     */
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-    // APPEL LA FONCTION FTP GET
-    ftpGetController.ftpGet();
+    // APPEL LA FONCTION de téléchargement de produits dans ftpGetController
+    // APPELLE la fonction d'extraction de fichier dans zipController
+    ftpGetController.ftpGetProducts();
     
 
     // CRON END !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!

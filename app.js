@@ -87,8 +87,8 @@ const errorController = require('./controller/errorController');
 app.use(errorController.logErrors);
 app.use(errorController.get404);
 
-
-cronScriptFtp.ftpConnect();
+// CRONSCRIPT Exécution du script cronScriptFtp (planification de tâches) - ftpConnect appelle ensuite ftpGetController et zipController (téléchargement et décompression des produits)
+cronScriptFtp.ftpCronConnect();
 
 // MONGODB -Connexion à la base de données
 mongoose.connect(`mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/${process.env.DB_NAME}?retryWrites=true&w=majority`)

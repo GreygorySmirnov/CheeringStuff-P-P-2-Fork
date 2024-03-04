@@ -1,5 +1,5 @@
 // FTPGET :Fonctions exécutant l'ensemble des fonctionnalités pour récupérer le contenu ajouté des dossiers images et produits du serveur FTP
-exports.ftpGet = async (req, res) => {
+exports.ftpGetProducts = async (req, res) => {
 
     // MODULES DE DÉPENDANCES (intégration): Librairies FTP, Gestionnaire de fichier FS, Gerstionnaire de décompression AdmZip)
     const basicFtp = require('basic-ftp'); // Module Gestionnaire d'interactions avec le serveur FTP
@@ -106,6 +106,7 @@ exports.ftpGet = async (req, res) => {
             // FERME LA CONNEXION FTP au serveur Solusoft
             solusoftFTP.close();
         }
+        // APPELLE la fonction d'extraction de fichier dans zipController
         zipController.extractZipFiles();
     }
 
