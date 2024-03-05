@@ -7,7 +7,9 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 const imagesPath = path.join(__dirname, "images");
-
+const ftp = require('ftp');
+const fs = require('fs');
+const AdmZip = require('adm-zip');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -37,13 +39,13 @@ app.get("/", (req, res) => {
 app.use("/images", express.static(imagesPath));
 
 // Importe les routes
-const routesUser = require("./routes/routesUser");
-const routesProduct = require("./routes/routesProduct");
-const routesOrder = require("./routes/routesOrder");
-const routesCart = require("./routes/routesCart");
-const routesError = require("./routes/routesError");
-const routesSearch = require("./routes/routesSearch");
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+const routesUser = require('./routes/routesUser');
+const routesProduct = require('./routes/routesProduct');
+const routesOrder = require('./routes/routesOrder');
+const routesCart = require('./routes/routesCart');
+const routesError = require('./routes/routesError');
+const routesSearch = require('./routes/routesSearch');
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 app.use(
   routesUser,
@@ -77,7 +79,3 @@ mongoose
   .catch((err) => {
     console.log("La connexion à la base de données a échoué", err);
   });
-//////
- /* const scriptOrders = require("./script/scriptOrders");
- scriptOrders.importOrders();  
- */
