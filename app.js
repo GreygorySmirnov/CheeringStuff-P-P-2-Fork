@@ -69,11 +69,11 @@ mongoose
   )
   .then(() => {
     console.log(
-      "La connexion à la base de données est établie, http://localhost:3030"
+      "La connexion à la base de données est établie, http://localhost:4242"
     );
 
-    app.listen(3030, () => {
-      console.log("Le serveur écoute sur le port 3030");
+    app.listen(4242, () => {
+      console.log("Le serveur écoute sur le port 4242");
     });
   })
   .catch((err) => {

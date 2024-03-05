@@ -11,6 +11,8 @@ router.post("/orders", authId, orderController.validateCart);
 // Route pour lister les commandes sur le panneau de bord de l'administrateur
 router.get("/orders", authAdmin, orderController.getOrdersAdmin);
 
+router.post("/orders/stripe", orderController.stripeConfrimOrder);
+
 module.exports = router;
 
 

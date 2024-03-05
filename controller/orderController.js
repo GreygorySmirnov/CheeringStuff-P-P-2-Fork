@@ -2,6 +2,7 @@
 
 const Cart = require("../models/carts");
 const Order = require("../models/orders");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 /* Méthode qui est appelée quand l'utilisateur valide son panier. Elle crée une commande avec les informations 
    du panier et supprime le panier de la collection dans la base de données simultanément. */
@@ -55,6 +56,41 @@ exports.validateCart = async (req, res) => {
     });
   }
 };
+
+exports.stripeConfrimOrder = async (req, res) => {
+    const event = req.body;
+
+    // https://dashboard.stripe.com/webhooks/create?endpoint_location=hosted&events=checkout.session.async_payment_succeeded%2Ccheckout.session.completed%2Ccheckout.session.async_payment_failed%2Ccheckout.session.expired
+    // Handle the event
+    switch (event.type) {
+      case "checkout.session.completed":
+        const checkoutSessionCompleted = event.data.object;
+        // Then define and call a function to handle the event checkout.session.completed
+        console.log("checkout.session.completed", checkoutSessionCompleted);
+        break;
+      case "checkout.session.async_payment_succeeded":
+        const checkoutSessionAsyncPaymentSucceeded = event.data.object;
+        // Then define and call a function to handle the event checkout.session.async_payment_succeeded
+        console.log("checkout.session.async_payment_succeeded", checkoutSessionAsyncPaymentSucceeded);
+        break;
+      case "checkout.session.expired":
+        const checkoutSessionExpired = event.data.object;
+        // Then define and call a function to handle the event checkout.session.expired
+        console.log("checkout.session.expired", checkoutSessionExpired);
+        break;
+      case "checkout.session.async_payment_failed":
+        const checkoutSessionAsyncPaymentFailed = event.data.object;
+        // Then define and call a function to handle the event checkout.session.async_payment_failed
+        console.log("checkout.session.async_payment_failed", checkoutSessionAsyncPaymentFailed);
+        break;
+      // ... handle other event types
+      default:
+        console.log(`Unhandled event type ${event.type}`);
+    }
+
+    // Return a response to acknowledge receipt of the event
+    res.json({ received: true });
+  };
 
 // Méthode qui retourne les commandes des utilisateurs à l'administrateur
 exports.getOrdersAdmin = async (req, res) => {
