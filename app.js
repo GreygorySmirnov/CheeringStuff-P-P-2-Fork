@@ -2,13 +2,13 @@
 
 const express = require("express");
 const app = express();
-const mongoose = require('mongoose')
-const bodyParser = require('body-parser');
-const cors = require('cors');
-const path = require('path');
-const imagesPath = path.join(__dirname, 'images');
-const fs = require('fs');
-const AdmZip = require('adm-zip');const cronScriptFtp = require('./script/cronScriptFtp')
+const mongoose = require("mongoose")
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const path = require("path");
+const imagesPath = path.join(__dirname, "images");
+const fs = require("fs");
+const AdmZip = require("adm-zip");const cronScriptFtp = require('./script/cronScriptFtp')
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
