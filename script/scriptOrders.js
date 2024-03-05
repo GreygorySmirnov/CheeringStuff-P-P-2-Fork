@@ -31,9 +31,9 @@ const createRemoteDirectory = async (remoteDirectory) => {
   }
 };
 
-
 // ZIP - Chemin d'accès vers le fichier zip (produits)
 const zipFilePath = "solusoft/compressedFiles/produitTest666.zip";
+
 // FTP Vérification de la connexion + Listing du contenu
 client.on("ready", () => {
   client.list((err, list) => {
@@ -50,8 +50,10 @@ client.on("ready", () => {
     if (err) throw err;
     // FTP Sélection du fichier à télécharger sur le serveuer - produitTest.zip (temporaire)
     const remoteFilePath = "/Produits/produitTest.zip";
+    
     // FTP Destination du dossier/nom du fichier dans le dossier du projet (local)
     const localFilePath = "solusoft/compressedFiles/produitTest666.zip";
+
     //GET - Méthode pour télécharger un fichier
     client.get(remoteFilePath, (err, stream) => {
       if (err) {
@@ -60,6 +62,7 @@ client.on("ready", () => {
       }
       // FTP PIPE PROCESS - Stream du fichier Serveur vers Stream Local
       stream.pipe(fs.createWriteStream(localFilePath));
+
       // FTP CLOSE EVENT - Écoute de la terminaison du processus de téléchargement
       stream.once("close", () => {
         console.log("File downloaded successfully");
@@ -93,9 +96,6 @@ exports.importOrders = async () => {
       const filePath = `solusoft/orders/${fileName}`;
       fs.writeFileSync(filePath, orderJSON);
     }
-
-    
-
   } catch (error) {
     console.error("Une erreur est survenue lors de l'importation des commandes :", error);
   }
@@ -119,7 +119,7 @@ const exportOrdersToFTP = async () => {
     for (const order of orders) {
       const orderJSON = orderToJSON(order);
       const fileName = `commande-${order._id}.json`;
-      const remoteFilePath = `${remoteDirectory}`; // Chemin sur le serveur FTP
+      const remoteFilePath = `${remoteDirectory}/${fileName}`; // Chemin sur le serveur FTP
        const localFilePath = `solusoft/orders/${fileName}`;
 
        // Écrire le fichier JSON temporairement localement
@@ -135,6 +135,7 @@ const exportOrdersToFTP = async () => {
           return;
         }
         console.log(`Le fichier ${fileName} a été téléversé avec succès.`);
+        
       });
     } else {
 
