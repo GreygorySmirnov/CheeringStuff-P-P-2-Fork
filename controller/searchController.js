@@ -15,7 +15,7 @@ exports.getSearch = (req, res) => {
       { DESCFRA: { $regex: searchString, $options: "i" } },
     ],
   })
-    .select("NOPROD DESCFRA")
+    .select("NOPROD DESCFRA POINTIMAG")
     .then((products) => {
       // Répond avec les produits correspondants
       res.status(200).json(products);
