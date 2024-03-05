@@ -67,7 +67,7 @@ exports.ftpGetProducts = async (req, res) => {
                     // CHEMIN D'ACCÈS LOCAL AUX PRODUITS (dossier + nom du fichier)
                     const localProductsPath = `solusoft/ftpReceivedFiles/Produits/${productFile.name}`;
 
-                    // TÉLÉCHARGEMENT DES PRODUITS CIBLÉS (lisaison Serveur vers Local)
+                    // BASIC-FTP DOWNLOADTO - TÉLÉCHARGEMENT DES PRODUITS CIBLÉS (lisaison Serveur vers Local)
                     await solusoftFTP.downloadTo(localProductsPath, remoteProductsPath);
                 }
 
