@@ -28,7 +28,7 @@ const orderToJSON = (order) => {
 // Fonction pour créer le répertoire distant
 const createRemoteDirectory = async (remoteDirectory) => {
   try {
-     client.mkdir(remoteDirectory, true);
+    client.mkdir(remoteDirectory, true);
     console.log(`Répertoire ${remoteDirectory} créé avec succès .`);
   } catch (error) {
     console.error(
@@ -38,52 +38,6 @@ const createRemoteDirectory = async (remoteDirectory) => {
   }
 };
 
-// ZIP - Chemin d'accès vers le fichier zip (produits)
-const zipFilePath = "solusoft/compressedFiles/produitTest666.zip";
-
-// FTP Vérification de la connexion + Listing du contenu
-client.on("ready", () => {
-  console.log("Vous êtes bien connecté au serveur FTP.");
-    
-    client.list((err, list) => {
-    if (err) throw err;
-    console.log("Listing du contenu des dossiers:");
-    console.dir(list);
-    client.end();
-  });
-});
-
-// FTP Active l'écoute des événements et déclanche les callbacks.
-client.on("ready", () => {
-  client.list((err, list) => {
-    if (err) throw err;
-    // FTP Sélection du fichier à télécharger sur le serveuer - produitTest.zip (temporaire)
-    const remoteFilePath = "/Produits/produitTest.zip";
-
-    // FTP Destination du dossier/nom du fichier dans le dossier du projet (local)
-    const localFilePath = "solusoft/compressedFiles/produitTest666.zip";
-
-    //GET - Méthode pour télécharger un fichier
-    client.get(remoteFilePath, (err, stream) => {
-      if (err) {
-        console.error("Error downloading file:", err);
-        return;
-      }
-      // FTP PIPE PROCESS - Stream du fichier Serveur vers Stream Local
-      stream.pipe(fs.createWriteStream(localFilePath));
-
-      // FTP CLOSE EVENT - Écoute de la terminaison du processus de téléchargement
-      stream.once("close", () => {
-        console.log("File downloaded successfully");
-        client.end(); // Close the FTP connection
-      });
-    });
-  });
-});
-// FTP Gestion des événements
-client.on("error", (err) => {
-  console.log("FTP error occurred: " + err);
-});
 // Fonction pour importer les commandes depuis MongoDB et les convertir en fichiers JSON.
 exports.importOrders = async () => {
   try {
@@ -94,7 +48,7 @@ exports.importOrders = async () => {
     const directoryPath = "solusoft/parseOrdersFiles";
 
     if (!fs.existsSync(directoryPath)) {
-      fs.mkdirSync(directoryPath, {recursive: true});
+      fs.mkdirSync(directoryPath, { recursive: true });
     }
 
     // Parcourir les commandes et les convertir en fichiers JSON
@@ -125,13 +79,13 @@ exports.exportOrdersToFTP = async () => {
   try {
     // Récupérer toutes les commandes de la base de données MongoDB
     const orders = await Order.find();
-    
+
     // Définir le répertoire cible sur le serveur FTP en dehors de la fonction de rappel
     const remoteDirectory = "/Commandes/commandeTraiter"; // Répertoire sur le serveur FTP
-    
+
     // Créer le répertoire distant "Commandes"
     await createRemoteDirectory(remoteDirectory);
-    
+
     //// Parcourir les commandes et les exporter vers le serveur FTP
     for (const order of orders) {
       const directoryPath = "solusoft/parseOrdersFiles";
@@ -141,7 +95,7 @@ exports.exportOrdersToFTP = async () => {
 
       // Écrire le fichier JSON temporairement localement
       fs.writeFileSync(localFilePathForUpload, orderJSON);
-     
+
       // Téléverser le fichier JSON vers le serveur FTP
       if (fs.existsSync(localFilePathForUpload) && client.connected) {
         client.put(
@@ -157,7 +111,7 @@ exports.exportOrdersToFTP = async () => {
             }
             console.log(`${fileName} a été téléversé avec succès.`);
             // Supprimer le fichier JSON temporaire localement
-              fsExtra.unlinkSync(localFilePath); 
+            fsExtra.unlinkSync(localFilePath);
           }
         );
       } else {
@@ -173,6 +127,4 @@ exports.exportOrdersToFTP = async () => {
     // Fermer la connexion FTP
     client.end();
   }
-  
 };
-
