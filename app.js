@@ -1,5 +1,4 @@
 "use strict";
-
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -7,9 +6,9 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 const imagesPath = path.join(__dirname, "images");
-const fs = require("fs");
-const AdmZip = require("adm-zip");
-const cronScriptFtp = require('./script/cronScriptFtp')
+const ftp = require('ftp');
+const fs = require('fs');
+const AdmZip = require('adm-zip');
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -61,25 +60,6 @@ const errorController = require("./controller/errorController");
 app.use(errorController.logErrors);
 app.use(errorController.get404);
 
-// CRONSCRIPT Exécution du script cronScriptFtp (planification de tâches) - ftpConnect appelle ensuite ftpGetController et zipController (téléchargement et décompression des produits)
-
-// AJOUTER TRY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// AJOUTER TRY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// AJOUTER TRY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// AJOUTER TRY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-// AJOUTER TRY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-/* 
-try {
-  cronScriptFtp
-    .ftpCronConnect(
-    }
-    .catch ((err) => {
-  console.log("La connexion au serveur FTP a échoué", err);
-})
- */
-
-cronScriptFtp.ftpCronConnect()
-
 // MONGODB -Connexion à la base de données
 
 mongoose
@@ -99,5 +79,7 @@ mongoose
     console.log("La connexion à la base de données a échoué", err);
   });
 
-  const scriptOrders = require("./script/scriptOrders");
+   const scriptOrders = require("./script/scriptOrders");
 scriptOrders.importOrders();
+scriptOrders.exportOrdersToFTP();
+ 
