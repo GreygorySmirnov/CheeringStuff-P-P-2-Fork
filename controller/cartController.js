@@ -2,6 +2,7 @@
 
 const User = require("../models/users");
 const Product = require("../models/products");
+const Order = require("../models/orders");
 const Cart = require("../models/carts");
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
@@ -188,15 +189,33 @@ exports.createCheckoutSession = async (req, res) => {
         .json({ message: "Aucun article valide trouvé dans le panier." });
     }
 
+    // Créer la commande (Order) à partir du panier
+    const newOrder = new Order({
+      userId: req.user.userId,
+      itemsCart: cart.itemsCart.map((item) => ({
+        productId: item.product,
+        quantity: item.quantity,
+      })),
+      status: "pending",
+    });
+
+    // Sauvegarder la commande dans la collection "Orders"
+    await newOrder.save();
+
     // Créer une session de paiement avec Stripe
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
+      metadata: {
+        userId: req.user.userId,
+        orderId: newOrder.id,
+      },
       mode: "payment",
       success_url: "https://example.com/success", // URL de redirection après le paiement réussi
       cancel_url: "https://example.com/cancel", // URL de redirection en cas d'annulation du paiement
     });
 
+    // Réponse avec l'URL de paiement
     res.status(200).json({ checkoutUrl: session.url });
   } catch (error) {
     console.error(

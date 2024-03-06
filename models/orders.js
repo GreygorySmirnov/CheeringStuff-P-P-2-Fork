@@ -31,6 +31,13 @@ const orderSchema = new Schema(
     totalAmount: {
       type: Number,
     },
+    // Statut de la commande
+    status: {
+      type: String,
+      enum: ["pending", "confirmed", "transfered"],
+      default: "pending",
+      required: true,
+    },
   },
   // Autres informations de commande
   { timestamps: true }

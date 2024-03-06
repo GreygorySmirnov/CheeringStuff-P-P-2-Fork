@@ -58,39 +58,45 @@ exports.validateCart = async (req, res) => {
 };
 
 exports.stripeConfrimOrder = async (req, res) => {
-    const event = req.body;
+  const event = req.body;
+  const metadata = event.data.object.metadata;
 
-    // https://dashboard.stripe.com/webhooks/create?endpoint_location=hosted&events=checkout.session.async_payment_succeeded%2Ccheckout.session.completed%2Ccheckout.session.async_payment_failed%2Ccheckout.session.expired
-    // Handle the event
-    switch (event.type) {
-      case "checkout.session.completed":
-        const checkoutSessionCompleted = event.data.object;
-        // Then define and call a function to handle the event checkout.session.completed
-        console.log("checkout.session.completed", checkoutSessionCompleted);
-        break;
+  console.log("Event type", event.type)
+
+  // https://dashboard.stripe.com/webhooks/create?endpoint_location=hosted&events=checkout.session.async_payment_succeeded%2Ccheckout.session.completed%2Ccheckout.session.async_payment_failed%2Ccheckout.session.expired
+  // Handle the event
+  switch (event.type) {
+    case "checkout.session.completed":
+      const checkoutSessionCompleted = event.data.object;
+
+      console.log("metadata", metadata);
+      console.log("orderId", metadata.orderId);
+      console.log("userId", metadata.userId);
+
+      // Then define and call a function to handle the event checkout.session.completed
+      console.log("checkout.session.completed", checkoutSessionCompleted);
+
+      Order.findOneAndUpdate(
+        { _id: metadata.orderId },
+        { status: "confirmed" }
+      );
+      break;
       case "checkout.session.async_payment_succeeded":
-        const checkoutSessionAsyncPaymentSucceeded = event.data.object;
-        // Then define and call a function to handle the event checkout.session.async_payment_succeeded
-        console.log("checkout.session.async_payment_succeeded", checkoutSessionAsyncPaymentSucceeded);
-        break;
-      case "checkout.session.expired":
-        const checkoutSessionExpired = event.data.object;
-        // Then define and call a function to handle the event checkout.session.expired
-        console.log("checkout.session.expired", checkoutSessionExpired);
-        break;
-      case "checkout.session.async_payment_failed":
-        const checkoutSessionAsyncPaymentFailed = event.data.object;
-        // Then define and call a function to handle the event checkout.session.async_payment_failed
-        console.log("checkout.session.async_payment_failed", checkoutSessionAsyncPaymentFailed);
-        break;
-      // ... handle other event types
-      default:
-        console.log(`Unhandled event type ${event.type}`);
-    }
+      const checkoutSessionAsyncPaymentSucceeded = event.data.object;
+      // Then define and call a function to handle the event checkout.session.async_payment_succeeded
+      console.log(
+        "checkout.session.async_payment_succeeded",
+        checkoutSessionAsyncPaymentSucceeded
+      );
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
 
-    // Return a response to acknowledge receipt of the event
-    res.json({ received: true });
-  };
+  // Return a response to acknowledge receipt of the event
+  res.json({ received: true });
+};
 
 // Méthode qui retourne les commandes des utilisateurs à l'administrateur
 exports.getOrdersAdmin = async (req, res) => {
