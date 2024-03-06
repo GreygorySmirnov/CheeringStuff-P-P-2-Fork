@@ -6,7 +6,7 @@ exports.ftpCronConnect = (req, res) => {
 
     // Importer le script ftpGetController pour accéder à la fonction ftpGet.js
     const ftpGetController = require('../controller/ftpGetController');
-    
+    const scriptOrders = require("./scriptOrders");
 
     // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // CRON START - Exécution du script cron - CRON *OFF* (Référence: https://crontab.guru/#0_*/1_*_*_*)
@@ -21,7 +21,9 @@ exports.ftpCronConnect = (req, res) => {
     // APPELLE la fonction d'extraction de fichier dans zipController
     ftpGetController.ftpGetProducts();
     
-
+    
+    scriptOrders.importOrders();
+    scriptOrders.exportOrdersToFTP();
     // CRON END !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     /*     
     })

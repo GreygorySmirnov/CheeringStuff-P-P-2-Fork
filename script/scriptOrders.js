@@ -1,85 +1,19 @@
+"use strict";
+
 const ftp = require("ftp");
 const fs = require("fs");
-const AdmZip = require("adm-zip");
+const Order = require("../models/orders");
+const fsExtra = require("fs-extra");
 
-// ZIP - Chemin d'accès vers le fichier zip (produits)
-const zipFilePath = "solusoft/compressedFiles/produitTest666.zip";
-
-try {
-  const zip = new AdmZip(zipFilePath);
-  zip.extractAllTo("solusoft/uncompressedFiles", true);
-} catch (err) {
-  if (err.message.includes("Aucun en-tête END trouvé")) {
-    console.error(
-      "Erreur : Format ZIP invalide ou non pris en charge. Le fichier est peut-être corrompu."
-    );
-  } else {
-    console.error("Erreur inattendue lors de lextraction ZIP :", err);
-  }
-}
-
-// FTP - Importation  des commandes
-const Order = require("./models/orders"); //
-//const Client = require('ftp');
-
-// Fonction pour importer les commandes depuis MongoDB et les convertir en fichiers JSON.
-const importOrders = async () => {
-  try {
-    // Récupérer toutes les commandes de la base de données MongoDB
-    const orders = await Order.find();
-
-    // Parcourir les commandes et les convertir en fichiers JSON
-    for (const order of orders) {
-      const orderJSON = orderToJSON(order);
-      const fileName = `commande-${order._id}.json`;
-      const filePath = `solusoft/orders/${fileName}`;
-
-      // Ecrire le fichier JSON dans le dossier 'solusoft/orders'
-      fs.writeFileSync(filePath, orderJSON);
-    }
-    // Créer un fichier dans le dossier 'orders'
-    const createFileInOrdersFolder = () => {
-      try {
-        // Nom du fichier à créer
-        const fileName = "nouveau-fichier.txt";
-
-        // Chemin complet du fichier à créer
-        const filePath = path.join(__dirname, "solusoft", "orders", fileName);
-
-        // Contenu du fichier
-        const fileContent = "Contenu du nouveau fichier.";
-
-        // Créer le fichier avec le contenu spécifié
-        fs.writeFileSync(filePath, fileContent);
-
-        console.log(
-          `Le fichier ${fileName} a été créé avec succès dans le dossier 'orders'.`
-        );
-      } catch (error) {
-        console.error(
-          "Une erreur est survenue lors de la création du fichier :",
-          error
-        );
-      }
-    };
-    // Appeler la fonction pour créer le fichier dans le dossier 'orders'
-    createFileInOrdersFolder();
-
-    // Se connecter au serveur FTP
-    client.connect(config);
-    // Fonction pour gérer les erreurs
-    function handleError(error) {
-      console.error("Une erreur est survenue :", error);
-      client.end(); // Fermer la connexion FTP en cas d'erreur
-    }
-  } catch (error) {
-    console.error(
-      "Une erreur est survenue lors de l'importation des commandes :",
-      error
-    );
-  }
-  client.end();
+// Connexion au serveur FTP
+const client = new ftp();
+const config = {
+  host: "ftp.solusoft-erp.com",
+  port: 21,
+  user: "Ricart@solusoft-erp.com",
+  password: "ric2024art",
 };
+client.connect(config);
 
 // Fonction pour convertir une commande en fichier JSON
 const orderToJSON = (order) => {
@@ -91,5 +25,106 @@ const orderToJSON = (order) => {
   return JSON.stringify(orderData);
 };
 
-// Démarrer l'importation des commandes
-importOrders();
+// Fonction pour créer le répertoire distant
+const createRemoteDirectory = async (remoteDirectory) => {
+  try {
+    client.mkdir(remoteDirectory, true);
+    console.log(`Répertoire ${remoteDirectory} créé avec succès .`);
+  } catch (error) {
+    console.error(
+      `Erreur lors de la création du répertoire ${remoteDirectory} :`,
+      error
+    );
+  }
+};
+
+// Fonction pour importer les commandes depuis MongoDB et les convertir en fichiers JSON.
+exports.importOrders = async () => {
+  try {
+    // Récupérer toutes les commandes de la base de données MongoDB
+    const orders = await Order.find();
+
+    // Créer le répertoire 'orders/' s'il n'existe pas
+    const directoryPath = "solusoft/parseOrdersFiles";
+
+    if (!fs.existsSync(directoryPath)) {
+      fs.mkdirSync(directoryPath, { recursive: true });
+    }
+
+    // Parcourir les commandes et les convertir en fichiers JSON
+
+    for (const order of orders) {
+      const orderJSON = orderToJSON(order);
+      const fileName = `c-${order._id}.json`;
+      const localFilePathForUpload = `${directoryPath}/${fileName}`;
+
+      // Ecrire le fichier JSON dans le dossier 'solusoft/orders'
+      fs.writeFileSync(localFilePathForUpload, orderJSON);
+    }
+
+    console.log("Importation des commandes terminée.");
+  } catch (error) {
+    console.error(
+      "Une erreur est survenue lors de l'importation des commandes :",
+      error
+    );
+  } finally {
+    // Fermer la connexion FTP
+    client.end();
+  }
+};
+
+// Fonction pour exporter les commandes vers le serveur FTP
+exports.exportOrdersToFTP = async () => {
+  try {
+    // Récupérer toutes les commandes de la base de données MongoDB
+    const orders = await Order.find();
+
+    // Définir le répertoire cible sur le serveur FTP en dehors de la fonction de rappel
+    const remoteDirectory = "/Commandes/commandeTraiter"; // Répertoire sur le serveur FTP
+
+    // Créer le répertoire distant "Commandes"
+    await createRemoteDirectory(remoteDirectory);
+
+    //// Parcourir les commandes et les exporter vers le serveur FTP
+    for (const order of orders) {
+      const directoryPath = "solusoft/parseOrdersFiles";
+      const orderJSON = orderToJSON(order);
+      const fileName = `c-${order._id}.json`;
+      const localFilePathForUpload = `${directoryPath}/${fileName}`;
+
+      // Écrire le fichier JSON temporairement localement
+      fs.writeFileSync(localFilePathForUpload, orderJSON);
+
+      // Téléverser le fichier JSON vers le serveur FTP
+      if (fs.existsSync(localFilePathForUpload) && client.connected) {
+        client.put(
+          localFilePathForUpload,
+          `${remoteDirectory}/${fileName}`,
+          (err) => {
+            if (err) {
+              console.error(
+                `Erreur lors de l'envoi du fichier ${fileName} au serveur FTP :`,
+                err
+              );
+              return;
+            }
+            console.log(`${fileName} a été téléversé avec succès.`);
+            // Supprimer le fichier JSON temporaire localement
+            fsExtra.unlinkSync(localFilePath);
+          }
+        );
+      } else {
+        console.error(`${fileName} n'existe pas.`);
+      }
+    }
+  } catch (error) {
+    console.error(
+      "Une erreur est survenue lors de l'exportation des commandes :",
+      error
+    );
+  } finally {
+    // Fermer la connexion FTP
+    client.end();
+  }
+};
