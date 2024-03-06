@@ -3,8 +3,10 @@
 const ftp = require("ftp");
 const fs = require("fs");
 const Order = require("../models/orders");
-const client = new ftp();
+const fsExtra = require("fs-extra");
 
+// Connexion au serveur FTP
+const client = new ftp();
 const config = {
   host: "ftp.solusoft-erp.com",
   port: 21,
@@ -12,6 +14,7 @@ const config = {
   password: "ric2024art",
 };
 client.connect(config);
+
 // Fonction pour convertir une commande en fichier JSON
 const orderToJSON = (order) => {
   const orderData = {
@@ -25,7 +28,7 @@ const orderToJSON = (order) => {
 // Fonction pour créer le répertoire distant
 const createRemoteDirectory = async (remoteDirectory) => {
   try {
-    await client.mkdir(remoteDirectory, true);
+     client.mkdir(remoteDirectory, true);
     console.log(`Répertoire ${remoteDirectory} créé avec succès .`);
   } catch (error) {
     console.error(
@@ -40,14 +43,16 @@ const zipFilePath = "solusoft/compressedFiles/produitTest666.zip";
 
 // FTP Vérification de la connexion + Listing du contenu
 client.on("ready", () => {
-  client.list((err, list) => {
+  console.log("Vous êtes bien connecté au serveur FTP.");
+    
+    client.list((err, list) => {
     if (err) throw err;
-    console.log("Vous êtes bien connecté au serveur FTP.");
     console.log("Listing du contenu des dossiers:");
     console.dir(list);
     client.end();
   });
 });
+
 // FTP Active l'écoute des événements et déclanche les callbacks.
 client.on("ready", () => {
   client.list((err, list) => {
@@ -87,8 +92,9 @@ exports.importOrders = async () => {
 
     // Créer le répertoire 'orders/' s'il n'existe pas
     const directoryPath = "solusoft/parseOrdersFiles";
+
     if (!fs.existsSync(directoryPath)) {
-      fs.mkdirSync(directoryPath, { recursive: true });
+      fs.mkdirSync(directoryPath, {recursive: true});
     }
 
     // Parcourir les commandes et les convertir en fichiers JSON
@@ -97,8 +103,8 @@ exports.importOrders = async () => {
       const orderJSON = orderToJSON(order);
       const fileName = `c-${order._id}.json`;
       const localFilePathForUpload = `${directoryPath}/${fileName}`;
-      // Ecrire le fichier JSON dans le dossier 'solusoft/orders'
 
+      // Ecrire le fichier JSON dans le dossier 'solusoft/orders'
       fs.writeFileSync(localFilePathForUpload, orderJSON);
     }
 
@@ -119,13 +125,13 @@ exports.exportOrdersToFTP = async () => {
   try {
     // Récupérer toutes les commandes de la base de données MongoDB
     const orders = await Order.find();
-
+    
     // Définir le répertoire cible sur le serveur FTP en dehors de la fonction de rappel
     const remoteDirectory = "/Commandes/commandeTraiter"; // Répertoire sur le serveur FTP
     
     // Créer le répertoire distant "Commandes"
     await createRemoteDirectory(remoteDirectory);
-
+    
     //// Parcourir les commandes et les exporter vers le serveur FTP
     for (const order of orders) {
       const directoryPath = "solusoft/parseOrdersFiles";
@@ -133,16 +139,9 @@ exports.exportOrdersToFTP = async () => {
       const fileName = `c-${order._id}.json`;
       const localFilePathForUpload = `${directoryPath}/${fileName}`;
 
-      // Valider le nom du fichier
-      if (!/\bc-[0-9a-f]{12,}\.json\b/.test(fileName)) {
-        console.error(`Le nom du fichier ${fileName} est invalide.`);
-        continue;
-      }
-
       // Écrire le fichier JSON temporairement localement
-
       fs.writeFileSync(localFilePathForUpload, orderJSON);
-
+     
       // Téléverser le fichier JSON vers le serveur FTP
       if (fs.existsSync(localFilePathForUpload) && client.connected) {
         client.put(
@@ -158,7 +157,7 @@ exports.exportOrdersToFTP = async () => {
             }
             console.log(`${fileName} a été téléversé avec succès.`);
             // Supprimer le fichier JSON temporaire localement
-            // fs.unlinkSync(localFilePath);
+              fsExtra.unlinkSync(localFilePath); 
           }
         );
       } else {
@@ -174,5 +173,6 @@ exports.exportOrdersToFTP = async () => {
     // Fermer la connexion FTP
     client.end();
   }
+  
 };
 
