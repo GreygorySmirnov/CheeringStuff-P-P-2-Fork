@@ -193,8 +193,10 @@ exports.createCheckoutSession = async (req, res) => {
       payment_method_types: ["card"],
       line_items: lineItems,
       mode: "payment",
-      success_url: "https://example.com/success", // URL de redirection après le paiement réussi
-      cancel_url: "https://example.com/cancel", // URL de redirection en cas d'annulation du paiement
+      shipping_address_collection: {
+      },
+      success_url: "en attente", // URL de redirection après le paiement réussi
+      cancel_url: "en attente", // URL de redirection en cas d'annulation du paiement
     });
 
     res.status(200).json({ checkoutUrl: session.url });
