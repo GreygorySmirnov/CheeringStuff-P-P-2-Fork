@@ -1,5 +1,4 @@
 "use strict";
-
 const express = require("express");
 const app = express();
 const mongoose = require("mongoose");
@@ -46,6 +45,7 @@ const routesCart = require('./routes/routesCart');
 const routesError = require('./routes/routesError');
 const routesSearch = require('./routes/routesSearch');
 const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
+const cronScriptFtp = require('./script/cronScriptFtp')
 
 app.use(
   routesUser,
@@ -75,7 +75,11 @@ mongoose
     app.listen(4242, () => {
       console.log("Le serveur écoute sur le port 4242");
     });
+    cronScriptFtp.ftpCronConnect();
   })
   .catch((err) => {
     console.log("La connexion à la base de données a échoué", err);
   });
+
+  
+ 

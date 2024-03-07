@@ -197,7 +197,10 @@ exports.createCheckoutSession = async (req, res) => {
         orderId: newOrder.id,
       },
       mode: "payment",
-      success_url: "https://example.com/success", // URL de redirection après le paiement réussi
+      shipping_address_collection: {
+        allowed_countries: ['CA'], // Pays où la livraison est autorisée
+      },
+      success_url: "en attente", // URL de redirection après le paiement réussi
       cancel_url: "https://cheering-stuff-front-end-ten.vercel.app/cart", // URL de redirection en cas d'annulation du paiement
     });
 
