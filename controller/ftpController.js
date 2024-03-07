@@ -1,10 +1,12 @@
 // FTPGET :Fonctions exécutant l'ensemble des fonctionnalités pour récupérer le contenu ajouté des dossiers images et produits du serveur FTP
-exports.ftpGetProducts = async (req, res) => {
+exports.fetchProductsAndPhotos = async (req, res) => {
+
 
     // MODULES DE DÉPENDANCES (intégration): Librairies FTP, Gestionnaire de fichier FS, Gerstionnaire de décompression AdmZip)
     const basicFtp = require('basic-ftp'); // Module Gestionnaire d'interactions avec le serveur FTP
     const fs = require('fs'); // Module Gestionnaire de fichiers/(File System)
     const zipController = require('../controller/zipController');
+
 
 
     async function downloadRemoteFtpFiles() {
@@ -23,18 +25,25 @@ exports.ftpGetProducts = async (req, res) => {
             const remoteProductsDir = '/Produits/A traiter';
             const remotePhotosDir = '/Photos/A traiter';
             // EMPLACEMENT DES DOSSIERS LOCAUX POUR LA RÉCEPTION (produits et photos à traiter)
-            const solusoftFolder = 'solusoft';
             const localReceivedFilesProduits = 'solusoft/ftpReceivedFiles/Produits';
             const localReceivedFilesPhotos = 'solusoft/ftpReceivedFiles/Photos';
 
-            if (!fs.existsSync(solusoftFolder)) {
-                // CRÉATION DU DOSSIER RACINE "Solusoft" LOCAL s'il n'existe pas déjà
-                fs.mkdirSync(solusoftFolder, { recursive: true });
-                console.log("Le dossier local 'solusoftFolder' a été créé.");
-            } else {
-                console.log("Le dossier local 'solusoftFolder' existe déjà.");
-            }
+
+            /*             
+                        const solusoftFolder = 'solusoft';
+                        if (!fs.existsSync(solusoftFolder)) {
+                            // CRÉATION DU DOSSIER RACINE "Solusoft" LOCAL s'il n'existe pas déjà
+                            fs.mkdirSync(solusoftFolder, { recursive: true });
+                            console.log("Le dossier local 'solusoftFolder' a été créé.");
+                        } else {
+                            console.log("Le dossier local 'solusoftFolder' existe déjà.");
+                        }
             
+                        
+            
+             */
+
+
             if (!fs.existsSync(localReceivedFilesProduits)) {
                 // CRÉATION DU DOSSIER "PRODUITS" LOCAL s'il n'existe pas déjà
                 fs.mkdirSync(localReceivedFilesProduits, { recursive: true });
@@ -51,6 +60,8 @@ exports.ftpGetProducts = async (req, res) => {
                 console.log("Le dossier local 'ftpReceivedFiles/Photos' existe déjà.");
             }
 
+
+
             // CRÉATION DE LA LISTE DES FICHIERS PRODUITS contenus dans le dossiers Produits à traiter du serveur FTP
             try {
                 const productFilesList = await solusoftFTP.list(remoteProductsDir);
@@ -61,7 +72,6 @@ exports.ftpGetProducts = async (req, res) => {
                     if (productFile.isDirectory) {
                         continue; // Ignorer les répertoires
                     }
-
                     // CHEMIN D'ACCÈS DISTANT AUX PRODUITS (dossier + nom du fichier sur le serveur FTP)
                     const remoteProductsPath = `${remoteProductsDir}/${productFile.name}`;
                     // CHEMIN D'ACCÈS LOCAL AUX PRODUITS (dossier + nom du fichier)
@@ -112,5 +122,5 @@ exports.ftpGetProducts = async (req, res) => {
 
     // APPEL de la fonction de téléchargement du dossier
     downloadRemoteFtpFiles();
-    
+
 }
