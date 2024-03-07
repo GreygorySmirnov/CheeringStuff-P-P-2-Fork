@@ -242,8 +242,13 @@ exports.updateUser = (req, res) => {
 
         // Si un nouveau mot de passe est fourni, générer un hash pour le nouveau mot de passe
         if (req.body.newPassword) {
+          if(req.body.newPassword.length < 6) {
+            return res
+              .status(400)
+              .json({ error: "Le mot de passe doit contenir au moins 6 caractères." });
+          }
           // Générer le hash du nouveau mot de passe avec bcrypt
-          bcrypt.hash(req.body.newPassword, 10, (error, hash) => {
+          bcrypt.hash(req.body.newPassword, 12, (error, hash) => {
             if (error) {
               console.error(
                 "Erreur lors de la génération du hash du mot de passe :",
