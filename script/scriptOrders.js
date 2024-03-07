@@ -1,5 +1,5 @@
 "use strict";
-
+const basicFtp = require("basic-ftp");
 const ftp = require("ftp");
 const fs = require("fs");
 const Order = require("../models/orders");
@@ -13,6 +13,7 @@ const config = {
   user: "Ricart@solusoft-erp.com",
   password: "ric2024art",
 };
+
 client.connect(config);
 
 // Fonction pour convertir une commande en fichier JSON
@@ -37,6 +38,18 @@ const createRemoteDirectory = async (remoteDirectory) => {
     );
   }
 };
+
+// FTP Vérification de la connexion + Listing du contenu
+client.on("ready", () => {
+  console.log("Vous êtes bien connecté au serveur FTP.");
+
+  client.list((err, list) => {
+    if (err) throw err;
+    console.log("Listing du contenu des dossiers:");
+    console.dir(list);
+    client.end();
+  });
+});
 
 // Fonction pour importer les commandes depuis MongoDB et les convertir en fichiers JSON.
 exports.importOrders = async () => {
@@ -93,9 +106,16 @@ exports.exportOrdersToFTP = async () => {
       const fileName = `c-${order._id}.json`;
       const localFilePathForUpload = `${directoryPath}/${fileName}`;
 
+      // Valider le nom du fichier
+      if (!/\bc-[0-9a-z]{12,}\.json\b/.test(fileName)) {
+        console.error(` ${fileName} est invalide.`);
+        continue;
+      }
+
       // Écrire le fichier JSON temporairement localement
       fs.writeFileSync(localFilePathForUpload, orderJSON);
 
+      console.log(client.connected);
       // Téléverser le fichier JSON vers le serveur FTP
       if (fs.existsSync(localFilePathForUpload) && client.connected) {
         client.put(
@@ -110,8 +130,6 @@ exports.exportOrdersToFTP = async () => {
               return;
             }
             console.log(`${fileName} a été téléversé avec succès.`);
-            // Supprimer le fichier JSON temporaire localement
-            fsExtra.unlinkSync(localFilePath);
           }
         );
       } else {
