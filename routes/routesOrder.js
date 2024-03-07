@@ -11,6 +11,9 @@ router.post("/orders", authId, orderController.validateCart);
 // Route pour lister les commandes sur le panneau de bord de l'administrateur
 router.get("/orders", authAdmin, orderController.getOrdersAdmin);
 
+// Route pour lister les commandes d'un utilisateur connecté
+router.get("/orders/user", authId, orderController.getOrdersUser);
+
 module.exports = router;
 
 
