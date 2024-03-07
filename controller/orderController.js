@@ -86,10 +86,6 @@ exports.getOrdersAdmin = async (req, res) => {
 // Méthode qui retourne les commandes de l'utilisateur connecté
 exports.getOrdersUser = async (req, res) => {
   try {
-    // Vérifier l'authentification de l'utilisateur
-    if (!req.user || !req.user.userId) {
-      return res.status(401).json({ message: "Utilisateur non authentifié." });
-    }
 
     // Récupérez toutes les commandes de l'utilisateur depuis la base de données
     const orders = await Order.find({ userId: req.user.userId });
