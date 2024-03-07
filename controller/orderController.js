@@ -71,7 +71,6 @@ exports.stripeConfrimOrder = async (req, res) => {
 
       console.log("metadata", metadata);
       console.log("orderId", metadata.orderId);
-      console.log("userId", metadata.userId);
 
       // Then define and call a function to handle the event checkout.session.completed
       console.log("checkout.session.completed", checkoutSessionCompleted);
@@ -79,14 +78,6 @@ exports.stripeConfrimOrder = async (req, res) => {
       Order.findOneAndUpdate(
         { _id: metadata.orderId },
         { status: "confirmed" }
-      );
-      break;
-      case "checkout.session.async_payment_succeeded":
-      const checkoutSessionAsyncPaymentSucceeded = event.data.object;
-      // Then define and call a function to handle the event checkout.session.async_payment_succeeded
-      console.log(
-        "checkout.session.async_payment_succeeded",
-        checkoutSessionAsyncPaymentSucceeded
       );
       break;
     // ... handle other event types

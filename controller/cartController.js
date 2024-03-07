@@ -189,6 +189,19 @@ exports.createCheckoutSession = async (req, res) => {
         .json({ message: "Aucun article valide trouvé dans le panier." });
     }
 
+    // Créer une session de paiement avec Stripe
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items: lineItems,
+      metadata: {
+        orderId: newOrder.id,
+      },
+      mode: "payment",
+      success_url: "https://example.com/success", // URL de redirection après le paiement réussi
+      cancel_url: "https://cheering-stuff-front-end-ten.vercel.app/cart", // URL de redirection en cas d'annulation du paiement
+    });
+
+    // Todo add if session was created successfully
     // Créer la commande (Order) à partir du panier
     const newOrder = new Order({
       userId: req.user.userId,
@@ -201,19 +214,6 @@ exports.createCheckoutSession = async (req, res) => {
 
     // Sauvegarder la commande dans la collection "Orders"
     await newOrder.save();
-
-    // Créer une session de paiement avec Stripe
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      metadata: {
-        userId: req.user.userId,
-        orderId: newOrder.id,
-      },
-      mode: "payment",
-      success_url: "https://example.com/success", // URL de redirection après le paiement réussi
-      cancel_url: "https://example.com/cancel", // URL de redirection en cas d'annulation du paiement
-    });
 
     // Réponse avec l'URL de paiement
     res.status(200).json({ checkoutUrl: session.url });
