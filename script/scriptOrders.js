@@ -27,7 +27,6 @@ const orderToJSON = (order) => {
 // Fonction pour créer le répertoire distant
 const createRemoteDirectory = async (client, remoteDirectory) => {
   try {
-
     await client.mkdir(remoteDirectory, true);
     console.log(`Répertoire ${remoteDirectory} créé avec succès .`);
   } catch (error) {
@@ -36,7 +35,6 @@ const createRemoteDirectory = async (client, remoteDirectory) => {
       error
     );
   }
-
 };
 const ftpHandler = async (fn) => {
   const client = new ftp();
