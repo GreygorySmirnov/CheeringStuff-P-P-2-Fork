@@ -194,10 +194,10 @@ exports.createCheckoutSession = async (req, res) => {
       line_items: lineItems,
       mode: "payment",
       shipping_address_collection: {
-        allowed_countries: ['CA'], // Pays où la livraison est autorisée
+        allowed_countries: ["CA"], // Pays où la livraison est autorisée
       },
-      success_url: "en attente", // URL de redirection après le paiement réussi
-      cancel_url: "en attente", // URL de redirection en cas d'annulation du paiement
+      success_url: "https://www.example.com", // URL de redirection après le paiement réussi
+      cancel_url: "https://www.example.com", // URL de redirection en cas d'annulation du paiement
     });
 
     res.status(200).json({ checkoutUrl: session.url });
