@@ -10,7 +10,7 @@ const path = require("path");
 const imagesPath = path.join(__dirname, "images");
 const fsController = require('./controller/fsController')
 const cronScriptProducts = require('./script/fetchProductsAndPhotosFromFtp')
-const cronScriptOrders = require('./script/cronScript')
+// const cronScriptOrders = require('./script/cronScript')
 // const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 // METTRE DANS UNE FONCTION parseController.js
