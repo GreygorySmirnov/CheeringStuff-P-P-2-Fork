@@ -1,13 +1,9 @@
 // FTPGET :Fonctions exécutant l'ensemble des fonctionnalités pour récupérer le contenu ajouté des dossiers images et produits du serveur FTP
 exports.fetchProductsAndPhotos = async (req, res) => {
-
-
     // MODULES DE DÉPENDANCES (intégration): Librairies FTP, Gestionnaire de fichier FS, Gerstionnaire de décompression AdmZip)
     const basicFtp = require('basic-ftp'); // Module Gestionnaire d'interactions avec le serveur FTP
-    const fs = require('fs'); // Module Gestionnaire de fichiers/(File System)
     const zipController = require('../controller/zipController');
-
-
+    const fsController = require('../controller/fsController')
 
     async function downloadRemoteFtpFiles() {
         // CRÉATION INSTANCE CLIENT: connexion au client
@@ -21,52 +17,16 @@ exports.fetchProductsAndPhotos = async (req, res) => {
                 password: 'ric2024art',
             });
 
-            // EMPLACEMENT DES DOSSIERS DISTANTS À TÉLÉCHARGER DU SERVEUR FTP (produits et photos à traiter)
-            const remoteProductsDir = '/Produits/A traiter';
-            const remotePhotosDir = '/Photos/A traiter';
-            // EMPLACEMENT DES DOSSIERS LOCAUX POUR LA RÉCEPTION (produits et photos à traiter)
-            const localReceivedFilesProduits = 'solusoft/ftpReceivedFiles/Produits';
-            const localReceivedFilesPhotos = 'solusoft/ftpReceivedFiles/Photos';
-
-
-            /*             
-                        const solusoftFolder = 'solusoft';
-                        if (!fs.existsSync(solusoftFolder)) {
-                            // CRÉATION DU DOSSIER RACINE "Solusoft" LOCAL s'il n'existe pas déjà
-                            fs.mkdirSync(solusoftFolder, { recursive: true });
-                            console.log("Le dossier local 'solusoftFolder' a été créé.");
-                        } else {
-                            console.log("Le dossier local 'solusoftFolder' existe déjà.");
-                        }
-            
-                        
-            
-             */
-
-
-            if (!fs.existsSync(localReceivedFilesProduits)) {
-                // CRÉATION DU DOSSIER "PRODUITS" LOCAL s'il n'existe pas déjà
-                fs.mkdirSync(localReceivedFilesProduits, { recursive: true });
-                console.log("Le dossier local 'ftpReceivedFiles/Produits' a été créé.");
-            } else {
-                console.log("Le dossier local 'ftpReceivedFiles/Produits' existe déjà.");
-            }
-
-            if (!fs.existsSync(localReceivedFilesPhotos)) {
-                // CRÉATION DU DOSSIER "PHOTOS" LOCAL s'il n'existe pas déjà
-                fs.mkdirSync(localReceivedFilesPhotos, { recursive: true });
-                console.log("Le dossier local 'ftpReceivedFiles/Photos' a été créé.");
-            } else {
-                console.log("Le dossier local 'ftpReceivedFiles/Photos' existe déjà.");
-            }
-
-
+            // EXÉCUTER LES FONCTIONS CRÉATIONS DE DOSSIERS LOCAUX ET DISTANT FTP (PRODUITS + PHOTOS)
+            fsController.createProductsFolder();
+            fsController.createPhotosFolder();
 
             // CRÉATION DE LA LISTE DES FICHIERS PRODUITS contenus dans le dossiers Produits à traiter du serveur FTP
             try {
+                const remoteProductsDir = '/Produits/A traiter';
                 const productFilesList = await solusoftFTP.list(remoteProductsDir);
-
-
+                // EMPLACEMENT DU DOSSIER PRODUITS DISTANTS À TÉLÉCHARGER DU SERVEUR FTP (produits et photos à traiter)
+                console.log(remoteProductsDir)
                 // TÉLÉCHARGEMENT DES PRODUITS (dossier '/Produits/A traiter' du serveur FTP)
                 for (const productFile of productFilesList) {
                     if (productFile.isDirectory) {
@@ -88,7 +48,9 @@ exports.fetchProductsAndPhotos = async (req, res) => {
 
             // CRÉATION DE LA LISTE DES FICHIERS PHOTOS contenues dans le dossier Photos à traiter du serveur FTP
             try {
+                const remotePhotosDir = '/Photos/A traiter';
                 const photoFilesList = await solusoftFTP.list(remotePhotosDir);
+                // EMPLACEMENT DU DOSSIERS PHOTOS DISTANTS À TÉLÉCHARGER DU SERVEUR FTP (produits et photos à traiter)
 
 
                 // TÉLÉCHARGEMENT DES PHOTOS (dossier '/Photos/A traiter' du serveur FTP)
@@ -119,6 +81,12 @@ exports.fetchProductsAndPhotos = async (req, res) => {
         // APPELLE la fonction d'extraction de fichier dans zipController
         zipController.extractZipFiles();
     }
+
+
+
+
+
+
 
     // APPEL de la fonction de téléchargement du dossier
     downloadRemoteFtpFiles();
