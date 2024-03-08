@@ -86,7 +86,6 @@ exports.getOrdersAdmin = async (req, res) => {
 // Méthode qui retourne les commandes de l'utilisateur connecté
 exports.getOrdersUser = async (req, res) => {
   try {
-
     // Récupérez toutes les commandes de l'utilisateur depuis la base de données
     const orders = await Order.find({ userId: req.user.userId });
 
