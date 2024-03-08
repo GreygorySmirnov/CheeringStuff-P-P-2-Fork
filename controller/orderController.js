@@ -76,7 +76,8 @@ exports.stripeConfrimOrder = async (req, res) => {
             event.type === "checkout.session.completed"
               ? "confirmed"
               : "expired",
-          shipping: checkoutSession.shipping,
+          shipping: checkoutSession.shipping_details,
+          totalAmount: checkoutSession.amount_total / 100,
         }
       );
 
