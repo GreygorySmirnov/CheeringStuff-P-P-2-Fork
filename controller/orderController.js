@@ -58,31 +58,42 @@ exports.validateCart = async (req, res) => {
 };
 
 exports.stripeConfrimOrder = async (req, res) => {
-  const event = req.body;
-  const metadata = event.data.object.metadata;
-
-  console.log("Event type", event.type)
-
   // https://dashboard.stripe.com/webhooks/create?endpoint_location=hosted&events=checkout.session.async_payment_succeeded%2Ccheckout.session.completed%2Ccheckout.session.async_payment_failed%2Ccheckout.session.expired
-  // Handle the event
-  switch (event.type) {
-    case "checkout.session.completed":
-      const checkoutSessionCompleted = event.data.object;
+  const event = req.body;
 
-      console.log("metadata", metadata);
-      console.log("orderId", metadata.orderId);
+  if (
+    event.type === "checkout.session.completed" ||
+    event.type === "checkout.session.expired"
+  ) {
+    const checkoutSession = event.data.object;
 
-      // Then define and call a function to handle the event checkout.session.completed
-      console.log("checkout.session.completed", checkoutSessionCompleted);
-
-      Order.findOneAndUpdate(
-        { _id: metadata.orderId },
-        { status: "confirmed" }
+    try {
+      // Update the order status
+      const order = await Order.findOneAndUpdate(
+        { stripeCheckoutId: checkoutSession.id },
+        {
+          status:
+            event.type === "checkout.session.completed"
+              ? "confirmed"
+              : "expired",
+        }
       );
-      break;
-    // ... handle other event types
-    default:
-      console.log(`Unhandled event type ${event.type}`);
+
+      if (order) {
+        console.log(
+          `Order ${order._id} has been ${
+            event.type === "checkout.session.completed"
+              ? "confirmed"
+              : "expired"
+          }`
+        );
+
+        // Delete the cart
+        await Cart.findOneAndRemove({ userId: order.userId });
+      }
+    } catch (error) {
+      console.error("Error while updating order status", error);
+    }
   }
 
   // Return a response to acknowledge receipt of the event
