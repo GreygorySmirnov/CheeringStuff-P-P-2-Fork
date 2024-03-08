@@ -9,7 +9,8 @@ const cors = require("cors");
 const path = require("path");
 const imagesPath = path.join(__dirname, "images");
 const fsController = require('./controller/fsController')
-const cronScript = require('./script/fetchProductsAndPhotosFromFtp')
+const cronScriptProducts = require('./script/fetchProductsAndPhotosFromFtp')
+const cronScriptOrders = require('./script/cronScript')
 // const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 // METTRE DANS UNE FONCTION parseController.js
@@ -86,5 +87,9 @@ mongoose
   // APPEL DES SCRIPTS ET FONCTIONS AU DÉMARRAGE
   // CRÉER DOSSIER Solusoft
   fsController.createSolusoftRootFolder()
-  cronScript.fetchProductsAndPhotosFromFtp (); // Renommer fetchProducts éventuellement
+  cronScriptProducts.fetchProductsAndPhotosFromFtp (); // Renommer fetchProducts éventuellement
+  
+  // AJOUTER cronScriptOrders pour intégré les 2 fonctions de Toufik (mais le script/cronScript.s ne pull pas)
+  // cronScriptOrders.
+
       // Séparer fetchProducts de fetchPhotos et unzipPhotos
