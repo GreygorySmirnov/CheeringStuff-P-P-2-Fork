@@ -12,9 +12,9 @@ exports.fetchProductsAndPhotos = async (req, res) => {
         try {
             // FTP ACCÈS - Connexion au serveur FTP
             await solusoftFTP.access({
-                host: 'ftp.solusoft-erp.com',
-                user: 'Ricart@solusoft-erp.com',
-                password: 'ric2024art',
+                host: process.env.FTP_HOST,
+                user: process.env.FTP_USER,
+                password: process.env.FTP_PASSWORD,
             });
 
             // EXÉCUTER LES FONCTIONS CRÉATIONS DE DOSSIERS LOCAUX ET DISTANT FTP (PRODUITS + PHOTOS)
