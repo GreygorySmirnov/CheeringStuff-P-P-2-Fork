@@ -68,7 +68,7 @@ exports.stripeConfrimOrder = async (req, res) => {
     const checkoutSession = event.data.object;
 
     try {
-      // Update the order status
+      // Update the order
       const order = await Order.findOneAndUpdate(
         { stripeCheckoutId: checkoutSession.id },
         {
@@ -76,6 +76,7 @@ exports.stripeConfrimOrder = async (req, res) => {
             event.type === "checkout.session.completed"
               ? "confirmed"
               : "expired",
+          shipping: checkoutSession.shipping,
         }
       );
 

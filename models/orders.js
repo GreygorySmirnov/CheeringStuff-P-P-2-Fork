@@ -37,8 +37,8 @@ const orderSchema = new Schema(
       type: Number,
     },
     // Adresse de livraison
-    shippingAddress: {
-      type: String,
+    shipping: {
+      type: Object,
       required: false,
     },
     // Statut de la commande
