@@ -13,7 +13,6 @@ const cronScriptProducts = require('./script/fetchProductsAndPhotosFromFtp')
 const cronScriptFtp = require('./script/cronScriptFtp')
 // const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
-// METTRE DANS UNE FONCTION parseController.js
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(express.json());
@@ -63,9 +62,6 @@ const errorController = require("./controller/errorController");
 app.use(errorController.logErrors);
 app.use(errorController.get404);
 
-
-
-// METTRE DANS UNE FONCTION MONGODB - MONGODB -Connexion à la base de données
 mongoose
   .connect(
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/${process.env.DB_NAME}?retryWrites=true&w=majority`

@@ -27,6 +27,7 @@ const orderToJSON = (order) => {
 // Fonction pour créer le répertoire distant
 const createRemoteDirectory = async (client, remoteDirectory) => {
   try {
+
     await client.mkdir(remoteDirectory, true);
     console.log(`Répertoire ${remoteDirectory} créé avec succès .`);
   } catch (error) {
@@ -35,6 +36,7 @@ const createRemoteDirectory = async (client, remoteDirectory) => {
       error
     );
   }
+
 };
 const ftpHandler = async (fn) => {
   const client = new ftp();
@@ -93,8 +95,8 @@ exports.exportOrdersToFTP = async () => {
     // Définir le répertoire cible sur le serveur FTP en dehors de la fonction de rappel
     const remoteDirectory = "/Commandes/commandeTraiter"; // Répertoire sur le serveur FTP
 
-    // Créer le répertoire distant "Commandes"
-    await createRemoteDirectory(remoteDirectory);
+    // DÉCOMMENTER POUR RÉACTIVER LA CRÉATION du répertoire distant "Commandes"
+    // await createRemoteDirectory(remoteDirectory);
 
     //// Parcourir les commandes et les exporter vers le serveur FTP
     for (const order of orders) {
