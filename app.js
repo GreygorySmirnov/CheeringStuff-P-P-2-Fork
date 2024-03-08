@@ -1,14 +1,17 @@
 "use strict";
+
+// MODULES & FUNCTIONS REQUIRE (prérequis - npm i)
 const express = require("express");
 const app = express();
-const mongoose = require("mongoose");
+const mongoose = require("mongoose")
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 const imagesPath = path.join(__dirname, "images");
-const ftp = require('ftp');
-const fs = require('fs');
-const AdmZip = require('adm-zip');
+const fsController = require('./controller/fsController')
+const cronScriptProducts = require('./script/fetchProductsAndPhotosFromFtp')
+const cronScriptFtp = require('./script/cronScriptFtp')
+// const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -44,8 +47,6 @@ const routesOrder = require('./routes/routesOrder');
 const routesCart = require('./routes/routesCart');
 const routesError = require('./routes/routesError');
 const routesSearch = require('./routes/routesSearch');
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
-const cronScriptFtp = require('./script/cronScriptFtp')
 
 app.use(
   routesUser,
@@ -61,8 +62,6 @@ const errorController = require("./controller/errorController");
 app.use(errorController.logErrors);
 app.use(errorController.get404);
 
-// MONGODB -Connexion à la base de données
-
 mongoose
   .connect(
     `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.DB_CLUSTER}/${process.env.DB_NAME}?retryWrites=true&w=majority`
@@ -75,11 +74,15 @@ mongoose
     app.listen(3030, () => {
       console.log("Le serveur écoute sur le port 3030");
     });
+    // EXÉCUTION DE FN de cronScriptFtp >>> cronScriptFtp DOIT ÊTRE RENOMMÉ! >>> fetchOrdersFromMongo.js + refaire le import en haut
     cronScriptFtp.ftpCronConnect();
+    
   })
   .catch((err) => {
     console.log("La connexion à la base de données a échoué", err);
   });
 
-  
- 
+  // APPEL DES SCRIPTS ET FONCTIONS AU DÉMARRAGE
+  // CRÉER DOSSIER Solusoft
+  fsController.createSolusoftRootFolder()
+  cronScriptProducts.fetchProductsAndPhotosFromFtp () // Renommer fetchProducts éventuellement
