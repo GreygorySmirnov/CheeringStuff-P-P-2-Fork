@@ -10,6 +10,7 @@ const path = require("path");
 const imagesPath = path.join(__dirname, "images");
 const fsController = require('./controller/fsController')
 const cronScriptProducts = require('./script/fetchProductsAndPhotosFromFtp')
+const cronScriptFtp = require('./script/cronScriptFtp')
 // const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 // METTRE DANS UNE FONCTION parseController.js
@@ -77,6 +78,8 @@ mongoose
     app.listen(3030, () => {
       console.log("Le serveur écoute sur le port 3030");
     });
+    // EXÉCUTION DE FN de cronScriptFtp >>> cronScriptFtp DOIT ÊTRE RENOMMÉ! >>> fetchOrdersFromMongo.js + refaire le import en haut
+    cronScriptFtp.ftpCronConnect();
     
   })
   .catch((err) => {
