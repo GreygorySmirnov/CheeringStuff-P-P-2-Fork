@@ -42,6 +42,7 @@ exports.fetchProductsAndPhotos = async (req, res) => {
                 }
 
                 console.log('Les produits ont été téléchargé avec succès!');
+            // PRODUCTS DOWNLOAD ERREUR
             } catch (error) {
                 console.log("Erreur lors du téléchargement du dossier des produits")
             }
@@ -69,9 +70,11 @@ exports.fetchProductsAndPhotos = async (req, res) => {
                 }
 
                 console.log('Les photos ont été téléchargé avec succès!');
+            // PRODUCTS DOWNLOAD ERREUR
             } catch (error) {
                 console.log("Erreur lors du téléchargement des dossiers photos")
             }
+        // FTP CONNEXION - ERREUR
         } catch (error) {
             console.error('Erreur lors de la connexion au serveur FTP', error);
         } finally {

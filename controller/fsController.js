@@ -1,5 +1,6 @@
 const fs = require('fs'); // Module Gestionnaire de fichiers/(File System)
 
+// CRÉATION DU DOSSIER RACINE SOLUSOFT
 exports.createSolusoftRootFolder = async (req, res) => {
     const solusoftFolder = 'solusoft';
     if (!fs.existsSync(solusoftFolder)) {
@@ -12,6 +13,7 @@ exports.createSolusoftRootFolder = async (req, res) => {
 
 }
 
+// CRÉATION DU DOSSIER SOLUSOFT/PRODUITS
 exports.createProductsFolder = async (req, res) => {
     // EMPLACEMENT DU DOSSIER PRODUITS LOCAL POUR LA RÉCEPTION (produits et photos à traiter)
     const localReceivedFilesProduits = 'solusoft/ftpReceivedFiles/Produits';
@@ -25,6 +27,7 @@ exports.createProductsFolder = async (req, res) => {
     }
 }
 
+// CRÉATION DU DOSSIER SOLUSOFT/PHOTOS
 exports.createPhotosFolder = async (req, res) => {
     // EMPLACEMENT DU DOSSIERS PHOTOS LOCAL POUR LA RÉCEPTION (produits et photos à traiter)
     const localReceivedFilesPhotos = 'solusoft/ftpReceivedFiles/Photos';
