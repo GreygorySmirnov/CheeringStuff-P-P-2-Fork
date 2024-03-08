@@ -6,15 +6,13 @@ const Order = require("../models/orders");
 const fsExtra = require("fs-extra");
 
 // Connexion au serveur FTP
-const client = new ftp();
+
 const config = {
   host: "ftp.solusoft-erp.com",
   port: 21,
   user: "Ricart@solusoft-erp.com",
   password: "ric2024art",
 };
-
-client.connect(config);
 
 // Fonction pour convertir une commande en fichier JSON
 const orderToJSON = (order) => {
@@ -27,9 +25,9 @@ const orderToJSON = (order) => {
 };
 
 // Fonction pour créer le répertoire distant
-const createRemoteDirectory = async (remoteDirectory) => {
+const createRemoteDirectory = async (client, remoteDirectory) => {
   try {
-    client.mkdir(remoteDirectory, true);
+    await client.mkdir(remoteDirectory, true);
     console.log(`Répertoire ${remoteDirectory} créé avec succès .`);
   } catch (error) {
     console.error(
@@ -38,18 +36,19 @@ const createRemoteDirectory = async (remoteDirectory) => {
     );
   }
 };
+const ftpHandler = async (fn) => {
+  const client = new ftp();
+  await client.connect(config);
 
-// FTP Vérification de la connexion + Listing du contenu
-client.on("ready", () => {
-  console.log("Vous êtes bien connecté au serveur FTP.");
-
-  client.list((err, list) => {
-    if (err) throw err;
-    console.log("Listing du contenu des dossiers:");
-    console.dir(list);
-    client.end();
-  });
-});
+  try {
+    await fn(client);
+  } catch (error) {
+    console.error("Une erreur est survenue lors de l'opération FTP :", error);
+  } finally {
+    await client.end();
+    console.log("**Déconnexion du serveur FTP réussie**");
+  }
+};
 
 // Fonction pour importer les commandes depuis MongoDB et les convertir en fichiers JSON.
 exports.importOrders = async () => {
@@ -81,15 +80,13 @@ exports.importOrders = async () => {
       "Une erreur est survenue lors de l'importation des commandes :",
       error
     );
-  } finally {
-    // Fermer la connexion FTP
-    client.end();
   }
 };
 
 // Fonction pour exporter les commandes vers le serveur FTP
 exports.exportOrdersToFTP = async () => {
-  try {
+  await ftpHandler(async (client) => {
+    
     // Récupérer toutes les commandes de la base de données MongoDB
     const orders = await Order.find();
 
@@ -115,7 +112,6 @@ exports.exportOrdersToFTP = async () => {
       // Écrire le fichier JSON temporairement localement
       fs.writeFileSync(localFilePathForUpload, orderJSON);
 
-      console.log(client.connected);
       // Téléverser le fichier JSON vers le serveur FTP
       if (fs.existsSync(localFilePathForUpload) && client.connected) {
         client.put(
@@ -129,6 +125,7 @@ exports.exportOrdersToFTP = async () => {
               );
               return;
             }
+            console.log(client.connected);
             console.log(`${fileName} a été téléversé avec succès.`);
           }
         );
@@ -136,13 +133,5 @@ exports.exportOrdersToFTP = async () => {
         console.error(`${fileName} n'existe pas.`);
       }
     }
-  } catch (error) {
-    console.error(
-      "Une erreur est survenue lors de l'exportation des commandes :",
-      error
-    );
-  } finally {
-    // Fermer la connexion FTP
-    client.end();
-  }
+  });
 };
