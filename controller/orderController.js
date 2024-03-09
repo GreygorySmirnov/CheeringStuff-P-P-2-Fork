@@ -128,3 +128,22 @@ exports.getOrdersAdmin = async (req, res) => {
     });
   }
 };
+
+// Méthode qui retourne les commandes de l'utilisateur connecté
+exports.getOrdersUser = async (req, res) => {
+  try {
+    // Récupérez toutes les commandes de l'utilisateur depuis la base de données
+    const orders = await Order.find({ userId: req.user.userId });
+
+    // Envoyez la liste des commandes en tant que réponse
+    res.status(200).json({ orders });
+  } catch (error) {
+    console.error(
+      "Une erreur s'est produite lors de la récupération des commandes.",
+      error
+    );
+    res.status(500).json({
+      error: "Une erreur s'est produite lors de la récupération des commandes.",
+    });
+  }
+};
