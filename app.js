@@ -76,7 +76,6 @@ mongoose
     });
     // EXÉCUTION DE FN de cronScriptFtp >>> cronScriptFtp DOIT ÊTRE RENOMMÉ! >>> fetchOrdersFromMongo.js + refaire le import en haut
     cronScriptFtp.ftpCronConnect();
-
   })
   .catch((err) => {
     console.log("La connexion à la base de données a échoué", err);
