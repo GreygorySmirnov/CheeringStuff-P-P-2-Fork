@@ -1,4 +1,4 @@
-exports.extractZipFiles = async (req, res) => {
+exports.extractZipPhotosFiles = async (req, res) => {
     const AdmZip = require('adm-zip'); // Module Gestionnaire de compression de fichier
     const fs = require('fs').promises; // Module intégré Gestionnaire de fichiers/(File System)
     const path = require('path') // Module intégré Gestionnaire de chemin d'accès au fichier
