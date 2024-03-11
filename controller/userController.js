@@ -132,6 +132,7 @@ exports.getListUsers = (req, res) => {
         isAdmin: user.isAdmin,
         isActive: user.isActive,
         _id: user._id,
+        createdAt: user.createdAt,
       }));
       // Renvoi la liste des utilisateurs sous forme de réponse JSON avec un code HTTP 200 (OK)
       res.status(200).json(listUsers);

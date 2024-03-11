@@ -9,7 +9,7 @@ const cors = require("cors");
 const path = require("path");
 const imagesPath = path.join(__dirname, "images");
 const fsController = require('./controller/fsController')
-const cronScriptProducts = require('./script/fetchProductsAndPhotosFromFtp')
+const cronScheduledTasks = require('./script/cronScheduledTasks')
 const cronScriptFtp = require('./script/cronScriptFtp')
 // const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
@@ -76,13 +76,12 @@ mongoose
     });
     // EXÉCUTION DE FN de cronScriptFtp >>> cronScriptFtp DOIT ÊTRE RENOMMÉ! >>> fetchOrdersFromMongo.js + refaire le import en haut
     cronScriptFtp.ftpCronConnect();
-    
   })
   .catch((err) => {
     console.log("La connexion à la base de données a échoué", err);
   });
 
-  // APPEL DES SCRIPTS ET FONCTIONS AU DÉMARRAGE
-  // CRÉER DOSSIER Solusoft
-  fsController.createSolusoftRootFolder()
-  cronScriptProducts.fetchProductsAndPhotosFromFtp () // Renommer fetchProducts éventuellement
+// APPEL DES SCRIPTS ET FONCTIONS AU DÉMARRAGE DE L'API
+// CRÉER DOSSIER Solusoft
+fsController.createSolusoftRootFolder()
+cronScheduledTasks.fetchProductsAndPhotosFromFtpDaily() // Renommer fetchProducts éventuellement
