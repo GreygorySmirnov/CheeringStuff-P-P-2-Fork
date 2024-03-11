@@ -3,10 +3,9 @@
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.JWT_SECRET;
 const Product = require("../models/products");
-const ProductNewModel = require("../models/productsNewModel");
+const productNewModel = require("../models/productsNewModel");
 require("dotenv").config();
 const fs = require("fs");
-const productsNewModel = require("../models/productsNewModel");
 
 // Fonction qui récupère et liste tous les produits de la base de données
 exports.getProducts = (req, res) => {
@@ -117,9 +116,8 @@ exports.getProductById = (req, res) => {
 };
 
 
-
 // PRODUCTNEWMODEL JP Fonction récupérer un produit par son ID.
-exports.createProductById = async (req, res) => {
+exports.createProductByTextFile = async (req, res) => {
   // const token = req.headers.authorization?.split(" ")[1];
   const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/productNewModelTest.txt'
   // console.log('PATH PRODUIT: ' + (productTextFilePath))
@@ -128,9 +126,17 @@ exports.createProductById = async (req, res) => {
   try {
     const productDataText = JSON.parse(fs.readFileSync(productTextFilePath, 'utf8'));
     //    console.log(('contenu de productTextfilePath') + (productDataText))
-    productsNewModel.insertMany(productDataText);
+    productNewModel.insertMany(productDataText);
+    productNewModel.find()
+      .then(products => {
+        console.log("All products in the 'products' collection:", products);
+      })
+      .catch(error => {
+        console.error("Error finding products:", error);
+      });
 
   } catch (error) {
     console.error("Error reading file:", error);
   }
+
 }

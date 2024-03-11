@@ -86,4 +86,4 @@ mongoose
 // CRÉER DOSSIER Solusoft
 fsController.createSolusoftRootFolder();
 cronScheduledTasks.fetchProductsAndPhotosFromFtpDaily() // Renommer fetchProducts éventuellement;
-productController.createProductById();
+productController.createProductByTextFile();

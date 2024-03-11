@@ -13,7 +13,7 @@ router.get('/products',   ProductController.getProducts);
 router.get('/products/:id', authId, ProductController.getProductById);
 
 // Route pour AJOUTER (create) un produit spécifique par son ID (accessible par un utilisateur authentifié)
-router.post('/products/newProduct', authId, ProductController.createProductById);
+// router.post('/products/newProduct', authId, ProductController.createProductByTextFile);
 
 // Route pour MODIFIER (update) un produit spécifique déjà existant par son ID (accessible par un utilisateur authentifié)
 // (à venir) router.put('/products/:id', authId, ProductController.updateProductById);
