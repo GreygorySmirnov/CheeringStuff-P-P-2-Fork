@@ -11,5 +11,5 @@ exports.fetchProductsAndPhotosFromFtpDaily = (req, res) => {
 
     // MODE TEST: APPEL LA FONCTION de téléchargement de produits dans ftpController INSTANNÉMENT (pour TESTER et pour le bouton fetch, si nécessaire)
     ftpController.fetchProductsAndPhotosFromFtpDaily();
-    
+    // mongoDbController.parseNewProductsToJson
 }
