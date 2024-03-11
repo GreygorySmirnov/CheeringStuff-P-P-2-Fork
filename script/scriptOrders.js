@@ -38,7 +38,7 @@ const createRemoteDirectory = async (client, remoteDirectory) => {
 };
 const ftpHandler = async (fn) => {
   const client = new ftp();
-  await client.connect(config);
+ client.connect(config);
 
   try {
     await fn(client);
@@ -93,9 +93,6 @@ exports.exportOrdersToFTP = async () => {
     // Définir le répertoire cible sur le serveur FTP en dehors de la fonction de rappel
     const remoteDirectory = "/Commandes/commandeTraiter"; // Répertoire sur le serveur FTP
 
-    // DÉCOMMENTER POUR RÉACTIVER LA CRÉATION du répertoire distant "Commandes"
-    // await createRemoteDirectory(remoteDirectory);
-
     //// Parcourir les commandes et les exporter vers le serveur FTP
     for (const order of orders) {
       const directoryPath = "solusoft/parseOrdersFiles";
@@ -139,5 +136,14 @@ exports.exportOrdersToFTP = async () => {
         console.error(`${fileName} n'existe pas.`);
       }
     }
+    // Supprimer le contenu de parseOrdersFiles
+    const directoryPath = "solusoft/parseOrdersFiles";
+    const files = fs.readdirSync(directoryPath);
+
+    for (const file of files) {
+      fs.unlinkSync(`${directoryPath}/${file}`);
+    }
+
+    console.log("Le contenu de parseOrdersFiles a été supprimé.");
   });
 };
