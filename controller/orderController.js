@@ -91,7 +91,8 @@ exports.stripeConfrimOrder = async (req, res) => {
         );
 
         // Delete the cart
-        await Cart.findOneAndRemove({ userId: order.userId });
+        const deletedCart = await Cart.findOneAndRemove({ userId: order.userId });
+        console.log(`Cart ${deletedCart._id} has been deleted`);
       }
     } catch (error) {
       console.error("Error while updating order status", error);
