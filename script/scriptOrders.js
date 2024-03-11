@@ -38,7 +38,7 @@ const createRemoteDirectory = async (client, remoteDirectory) => {
 };
 const ftpHandler = async (fn) => {
   const client = new ftp();
- client.connect(config);
+  client.connect(config);
 
   try {
     await fn(client);
@@ -124,12 +124,9 @@ exports.exportOrdersToFTP = async () => {
             }
             console.log(client.connected);
             console.log(`${fileName} a été téléversé avec succès.`);
-            
+
             // update the status of the order in the database
-            Order.findByIdAndUpdate(
-              order._id,
-              { status: "transfered" },
-            );
+            Order.findByIdAndUpdate(order._id, { status: "transfered" });
           }
         );
       } else {
