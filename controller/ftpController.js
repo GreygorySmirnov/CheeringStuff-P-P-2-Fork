@@ -77,7 +77,7 @@ exports.fetchProductsAndPhotosFromFtpDaily = async (req, res) => {
                 console.log(remotePhotosDir);
                 for (const photoFiles of photoFilesList) {
                     if (photoFiles.isDirectory) {
-                        continue; // Ignore directories
+                        continue; // Ignorer les dossiers
                     }
                     // CHEMIN D'ACCÈS DISTANT AUX PHOTOS (dossier + nom du fichier sur le serveur FTP)
                     const remotePhotosPath = `${remotePhotosDir}/${photoFiles.name}`;

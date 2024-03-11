@@ -81,7 +81,7 @@ mongoose
     console.log("La connexion à la base de données a échoué", err);
   });
 
-// APPEL DES SCRIPTS ET FONCTIONS AU DÉMARRAGE
+// APPEL DES SCRIPTS ET FONCTIONS AU DÉMARRAGE DE L'API
 // CRÉER DOSSIER Solusoft
 fsController.createSolusoftRootFolder()
 cronScheduledTasks.fetchProductsAndPhotosFromFtpDaily() // Renommer fetchProducts éventuellement
