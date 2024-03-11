@@ -1,9 +1,9 @@
 "use strict";
-const basicFtp = require("basic-ftp");
+
 const ftp = require("ftp");
 const fs = require("fs");
 const Order = require("../models/orders");
-const fsExtra = require("fs-extra");
+
 
 // Connexion au serveur FTP
 
@@ -38,7 +38,7 @@ const createRemoteDirectory = async (client, remoteDirectory) => {
 };
 const ftpHandler = async (fn) => {
   const client = new ftp();
-  await client.connect(config);
+  client.connect(config);
 
   try {
     await fn(client);
@@ -86,15 +86,12 @@ exports.importOrders = async () => {
 // Fonction pour exporter les commandes vers le serveur FTP
 exports.exportOrdersToFTP = async () => {
   await ftpHandler(async (client) => {
-    
+
     // Récupérer toutes les commandes de la base de données MongoDB
     const orders = await Order.find();
 
     // Définir le répertoire cible sur le serveur FTP en dehors de la fonction de rappel
     const remoteDirectory = "/Commandes/commandeTraiter"; // Répertoire sur le serveur FTP
-
-    // DÉCOMMENTER POUR RÉACTIVER LA CRÉATION du répertoire distant "Commandes"
-    // await createRemoteDirectory(remoteDirectory);
 
     //// Parcourir les commandes et les exporter vers le serveur FTP
     for (const order of orders) {
@@ -127,17 +124,23 @@ exports.exportOrdersToFTP = async () => {
             }
             console.log(client.connected);
             console.log(`${fileName} a été téléversé avec succès.`);
-            
+
             // update the status of the order in the database
-            Order.findByIdAndUpdate(
-              order._id,
-              { status: "transfered" },
-            );
+            Order.findByIdAndUpdate(order._id, { transfered: true });
           }
         );
       } else {
         console.error(`${fileName} n'existe pas.`);
       }
     }
+    // Supprimer le contenu de parseOrdersFiles
+    const directoryPath = "solusoft/parseOrdersFiles";
+    const files = fs.readdirSync(directoryPath);
+
+    for (const file of files) {
+      fs.unlinkSync(`${directoryPath}/${file}`);
+    }
+
+    console.log("Le contenu de parseOrdersFiles a été supprimé.");
   });
 };
