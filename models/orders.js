@@ -44,9 +44,13 @@ const orderSchema = new Schema(
     // Statut de la commande
     status: {
       type: String,
-      enum: ["pending", "confirmed", "transfered"],
+      enum: ["pending", "confirmed"],
       default: "pending",
       required: true,
+    },
+    transfered: {
+      type: Boolean,
+      default: false,
     },
   },
   // Autres informations de commande
