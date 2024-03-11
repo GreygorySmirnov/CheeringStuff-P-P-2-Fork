@@ -74,7 +74,6 @@ mongoose
     app.listen(4242, () => {
       console.log("Le serveur écoute sur le port 4242");
     });
-    // À RÉACTIVER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // EXÉCUTION DE FN de cronScriptFtp >>> cronScriptFtp DOIT ÊTRE RENOMMÉ! >>> fetchOrdersFromMongo.js + refaire le import en haut
     cronScriptFtp.ftpCronConnect();
 
