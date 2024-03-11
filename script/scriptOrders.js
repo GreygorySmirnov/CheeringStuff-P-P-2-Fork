@@ -1,9 +1,9 @@
 "use strict";
-const basicFtp = require("basic-ftp");
+
 const ftp = require("ftp");
 const fs = require("fs");
 const Order = require("../models/orders");
-const fsExtra = require("fs-extra");
+
 
 // Connexion au serveur FTP
 
@@ -86,7 +86,7 @@ exports.importOrders = async () => {
 // Fonction pour exporter les commandes vers le serveur FTP
 exports.exportOrdersToFTP = async () => {
   await ftpHandler(async (client) => {
-    
+
     // Récupérer toutes les commandes de la base de données MongoDB
     const orders = await Order.find();
 
