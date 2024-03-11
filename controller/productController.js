@@ -119,7 +119,7 @@ exports.getProductById = (req, res) => {
 // PRODUCTNEWMODEL JP Fonction récupérer un produit par son ID.
 exports.createProductByTextFile = async (req, res) => {
   // const token = req.headers.authorization?.split(" ")[1];
-  const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/productNewModelTest.txt'
+  const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/20240310_20030176_Produit.txt'
   // console.log('PATH PRODUIT: ' + (productTextFilePath))
 
   // Read product data as text from the file
