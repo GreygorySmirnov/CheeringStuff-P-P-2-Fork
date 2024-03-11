@@ -11,6 +11,7 @@ const imagesPath = path.join(__dirname, "images");
 const fsController = require('./controller/fsController')
 const cronScheduledTasks = require('./script/cronScheduledTasks')
 const cronScriptFtp = require('./script/cronScriptFtp')
+const productController = require('./controller/productController')
 // const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -75,7 +76,7 @@ mongoose
       console.log("Le serveur écoute sur le port 4242");
     });
     // EXÉCUTION DE FN de cronScriptFtp >>> cronScriptFtp DOIT ÊTRE RENOMMÉ! >>> fetchOrdersFromMongo.js + refaire le import en haut
-    cronScriptFtp.ftpCronConnect();
+    // cronScriptFtp.ftpCronConnect();
   })
   .catch((err) => {
     console.log("La connexion à la base de données a échoué", err);
@@ -83,5 +84,6 @@ mongoose
 
 // APPEL DES SCRIPTS ET FONCTIONS AU DÉMARRAGE DE L'API
 // CRÉER DOSSIER Solusoft
-fsController.createSolusoftRootFolder()
-cronScheduledTasks.fetchProductsAndPhotosFromFtpDaily() // Renommer fetchProducts éventuellement
+fsController.createSolusoftRootFolder();
+cronScheduledTasks.fetchProductsAndPhotosFromFtpDaily() // Renommer fetchProducts éventuellement;
+productController.createProductById();
