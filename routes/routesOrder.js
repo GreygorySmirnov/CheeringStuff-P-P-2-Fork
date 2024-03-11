@@ -13,4 +13,7 @@ router.get("/orders", authAdmin, orderController.getOrdersAdmin);
 // Route pour lister les commandes d'un utilisateur connecté
 router.get("/orders/user", authId, orderController.getOrdersUser);
 
+// Route pour créer une session Stripe pour le paiement
+router.post("/orders/stripe", orderController.stripeConfrimOrder);
+
 module.exports = router;

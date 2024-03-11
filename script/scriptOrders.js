@@ -127,6 +127,12 @@ exports.exportOrdersToFTP = async () => {
             }
             console.log(client.connected);
             console.log(`${fileName} a été téléversé avec succès.`);
+            
+            // update the status of the order in the database
+            Order.findByIdAndUpdate(
+              order._id,
+              { status: "transfered" },
+            );
           }
         );
       } else {

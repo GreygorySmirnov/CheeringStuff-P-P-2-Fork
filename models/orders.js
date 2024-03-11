@@ -13,6 +13,11 @@ const orderSchema = new Schema(
       ref: "User", // Référence à la collection "users"
       required: true, // Le champ est obligatoire
     },
+    // Identifiant du Checkout Stripe
+    stripeCheckoutId: {
+      type: String,
+      required: false,
+    },
     // Liste des articles dans la commande avec leur quantité
     itemsCart: [
       {
@@ -30,6 +35,18 @@ const orderSchema = new Schema(
     // Montant total de la commande
     totalAmount: {
       type: Number,
+    },
+    // Adresse de livraison
+    shipping: {
+      type: Object,
+      required: false,
+    },
+    // Statut de la commande
+    status: {
+      type: String,
+      enum: ["pending", "confirmed", "transfered"],
+      default: "pending",
+      required: true,
     },
   },
   // Autres informations de commande

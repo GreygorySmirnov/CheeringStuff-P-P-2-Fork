@@ -2,6 +2,7 @@
 
 const Cart = require("../models/carts");
 const Order = require("../models/orders");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 /* Méthode qui est appelée quand l'utilisateur valide son panier. Elle crée une commande avec les informations 
    du panier et supprime le panier de la collection dans la base de données simultanément. */
@@ -54,6 +55,51 @@ exports.validateCart = async (req, res) => {
       error: error.message || "Une erreur empêche de valider le panier.",
     });
   }
+};
+
+exports.stripeConfrimOrder = async (req, res) => {
+  // https://dashboard.stripe.com/webhooks/create?endpoint_location=hosted&events=checkout.session.async_payment_succeeded%2Ccheckout.session.completed%2Ccheckout.session.async_payment_failed%2Ccheckout.session.expired
+  const event = req.body;
+
+  if (
+    event.type === "checkout.session.completed" ||
+    event.type === "checkout.session.expired"
+  ) {
+    const checkoutSession = event.data.object;
+
+    try {
+      // Update the order
+      const order = await Order.findOneAndUpdate(
+        { stripeCheckoutId: checkoutSession.id },
+        {
+          status:
+            event.type === "checkout.session.completed"
+              ? "confirmed"
+              : "expired",
+          shipping: checkoutSession.shipping_details,
+          totalAmount: checkoutSession.amount_total / 100,
+        }
+      );
+
+      if (order) {
+        console.log(
+          `Order ${order._id} has been ${
+            event.type === "checkout.session.completed"
+              ? "confirmed"
+              : "expired"
+          }`
+        );
+
+        // Delete the cart
+        await Cart.findOneAndRemove({ userId: order.userId });
+      }
+    } catch (error) {
+      console.error("Error while updating order status", error);
+    }
+  }
+
+  // Return a response to acknowledge receipt of the event
+  res.json({ received: true });
 };
 
 // Méthode qui retourne les commandes des utilisateurs à l'administrateur
