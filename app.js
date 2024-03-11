@@ -76,7 +76,7 @@ mongoose
     });
     // À RÉACTIVER!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     // EXÉCUTION DE FN de cronScriptFtp >>> cronScriptFtp DOIT ÊTRE RENOMMÉ! >>> fetchOrdersFromMongo.js + refaire le import en haut
-    // cronScriptFtp.ftpCronConnect();
+    cronScriptFtp.ftpCronConnect();
 
   })
   .catch((err) => {
