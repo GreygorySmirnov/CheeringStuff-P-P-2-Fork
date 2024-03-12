@@ -116,9 +116,9 @@ exports.getProductById = (req, res) => {
 };
 
 
-// PRODUCTNEWMODEL JP Fonction récupérer un produit par son ID.
+// createProductByTextFile: Création d'un nouveau produit dans la collection 'products' de MongoDb. (s'il n'existe pas déjà)
 exports.createProductByTextFile = async (req, res) => {
-  const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/productNewModelTest.txt';
+  const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/20240228_08271080_Produit.txt';
 
   try {
     // Fonction qui lit et converti en JSON les produits téléchargés en format txt contenu dans le dossier de réception.

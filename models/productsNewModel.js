@@ -27,11 +27,28 @@ const productNewModel = new Schema(
         m_nPoids: Number,
         m_sNoteTechFra: String,
         m_sNoteTechAng: String,
-        // Tableaux peuvent être laissé vide initialement (optionel):
         m_tbCategories: [String],
         m_tbSpecifications: [String],
         m_tbGroupe: [String],
-        m_tbCaracteristiques: [String],
+        // Tableaux "Catégories" peuvent être laissé vide initialement (optionel):
+        m_tbCaracteristiques: {
+            type: Array,
+            // required: true, // Requis* Ce tableau contient des données
+            // of: new mongoose.Schema({
+                m_eIDCritereParent: Number,
+                m_tbCriteres: {
+                    type: Array,
+                    // required: true, // Requis* Ce tableau imbriqué contient des données
+                    // of: new mongoose.Schema({
+                        m_eIDCritere: Number,
+                        m_sDescFra: { type: String },
+                        m_sDescAng: { type: String },
+                        m_eOrdreAffich: { type: Number },
+                        m_sCodeCritere: { type: String },
+                    // }),
+                },
+            // }),
+        },
     }, { timestamps: true }); // Ajouter des horodatages (marqueur de temps) pour le suivi automatique des créations/modifications
 
 module.exports = mongoose.model('Product', productNewModel);
