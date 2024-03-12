@@ -118,32 +118,6 @@ exports.getProductById = (req, res) => {
 
 // PRODUCTNEWMODEL JP Fonction récupérer un produit par son ID.
 exports.createProductByTextFile = async (req, res) => {
-  // const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/20240310_20030176_Produit.txt'
-  const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/productNewModelTest.txt'
-
-  try {
-
-    // Fonction qui lit et converti en JSON les produits téléchargés en format txt contenu dans le dossier de réception.
-    const productDataText = JSON.parse(fs.readFileSync(productTextFilePath, 'utf8'));
-    // Fonction mongoose qui qppelle le nouveau modèle/schema de produits pour effectuer l'opération insertMany (ajouter).
-    // Ces produits parseJSON seront ajoutés dans la collection 'products' de mongoDb avec l'ensemble de leurs attrituts recueillit dans productDataText.
-    productNewModel.insertMany(productDataText)
-
-      .then(products => {
-        console.log("All products in the 'products' collection:", products);
-      })
-      .catch(error => {
-        console.error("Error finding products:", error);
-      });
-
-  } catch (error) {
-    console.error("Error reading file:", error);
-  }
-
-}
-
-
-exports.createProductByTextFile = async (req, res) => {
   const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/productNewModelTest.txt';
 
   try {
@@ -160,7 +134,7 @@ exports.createProductByTextFile = async (req, res) => {
         productsToInsert.push(product);
       } else {
         existingProductNumbers.add(product.m_sNoProduit);
-        console.warn(`Les produits avec l'attribut m_sNoProduit en double seront ignorés: ${product.m_sNoProduit}`);
+        console.warn(`MongoDB: Les produits avec l'attribut m_sNoProduit en double seront ignorés: ${product.m_sNoProduit}`);
       }
     }));
 
@@ -169,11 +143,11 @@ exports.createProductByTextFile = async (req, res) => {
       // Fonction mongoose qui qppelle le nouveau modèle/schema de produits pour effectuer l'opération insertMany (ajouter).
       // Ces produits parseJSON seront ajoutés dans la collection 'products' de mongoDb avec l'ensemble de leurs attrituts recueillit dans productDataText.
       await productNewModel.insertMany(productsToInsert);
-      console.log(`${productsToInsert.length} produits insérés avec succès.`);
+      console.log(`MongoDB: ${productsToInsert.length} produit(s) inséré(s) avec succès.`);
     } else {
-      console.log('Aucun nouveau produits a ajouté trouvé (ils ont tous m_sNoProduit dupliqué).');
+      console.log('MongoDB: Aucun nouveau produits a ajouté trouvé (Leurs attributs "m_sNoProduit" existe déjà dans la base de donnée MongoDB).');
     }
   } catch (error) {
-    console.error("Error processing product data:", error);
+    console.error("Erreur lors du traitement des données produit:", error);
   }
 };
