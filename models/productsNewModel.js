@@ -34,4 +34,4 @@ const productNewSchema = new Schema(
         m_tbCaracteristiques: [String],
     }, { timestamps: true }); // Ajouter des horodatages (marqueur de temps) pour le suivi automatique des créations/modifications
 
-module.exports = mongoose.model('Product', productNewSchema);
+module.exports = mongoose.model('NewProducts', productNewSchema);
