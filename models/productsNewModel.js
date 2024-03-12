@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // Définit le schéma de la collection "products" dans la base de données
-const productNewSchema = new Schema(
+const productNewModel = new Schema(
     {
         m_eIDProduit: Number,
         m_sNoProduit: String,
@@ -34,4 +34,4 @@ const productNewSchema = new Schema(
         m_tbCaracteristiques: [String],
     }, { timestamps: true }); // Ajouter des horodatages (marqueur de temps) pour le suivi automatique des créations/modifications
 
-module.exports = mongoose.model('NewProducts', productNewSchema);
+module.exports = mongoose.model('Product', productNewModel);

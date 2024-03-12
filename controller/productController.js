@@ -3,7 +3,7 @@
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.JWT_SECRET;
 const Product = require("../models/products");
-const productNewModel = require("../models/productsNewModel");
+const productNewModel = require("../models/productsNewModel"); // nouveau modèle/schema de produits avec les attributs de solusoft
 require("dotenv").config();
 const fs = require("fs");
 
@@ -118,17 +118,17 @@ exports.getProductById = (req, res) => {
 
 // PRODUCTNEWMODEL JP Fonction récupérer un produit par son ID.
 exports.createProductByTextFile = async (req, res) => {
-  // const token = req.headers.authorization?.split(" ")[1];
   // const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/20240310_20030176_Produit.txt'
   const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/productNewModelTest.txt'
-  // console.log('PATH PRODUIT: ' + (productTextFilePath))
 
-  // Read product data as text from the file
   try {
+
+    // Fonction qui lit et converti en JSON les produits téléchargés en format txt contenu dans le dossier de réception.
     const productDataText = JSON.parse(fs.readFileSync(productTextFilePath, 'utf8'));
-    //    console.log(('contenu de productTextfilePath') + (productDataText))
+    // Fonction mongoose qui qppelle le nouveau modèle/schema de produits pour effectuer l'opération insertMany (ajouter).
+    // Ces produits parseJSON seront ajoutés dans la collection 'products' de mongoDb avec l'ensemble de leurs attrituts recueillit dans productDataText.
     productNewModel.insertMany(productDataText)
-    
+
       .then(products => {
         console.log("All products in the 'products' collection:", products);
       })
@@ -141,3 +141,39 @@ exports.createProductByTextFile = async (req, res) => {
   }
 
 }
+
+
+exports.createProductByTextFile = async (req, res) => {
+  const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/productNewModelTest.txt';
+
+  try {
+    // Fonction qui lit et converti en JSON les produits téléchargés en format txt contenu dans le dossier de réception.
+    const productDataText = JSON.parse(fs.readFileSync(productTextFilePath, 'utf8'));
+
+    const productsToInsert = []; // Tableau qui contient les produits sans les dupliquer
+    const existingProductNumbers = new Set(); // Set pour conserver/enregistré les numéros de produits existant || Configurer pour stocker des numéros de produits existants uniques
+
+    // Vérifie les numéros de produit déjà existant avant de les insérer
+    await Promise.all(productDataText.map(async (product) => {
+      const existingProduct = await productNewModel.findOne({ m_sNoProduit: product.m_sNoProduit });
+      if (!existingProduct) {
+        productsToInsert.push(product);
+      } else {
+        existingProductNumbers.add(product.m_sNoProduit);
+        console.warn(`Les produits avec l'attribut m_sNoProduit en double seront ignorés: ${product.m_sNoProduit}`);
+      }
+    }));
+
+    if (productsToInsert.length > 0) {
+      // Insère les produits sans duplication de l'attribut m_sNoProduit.
+      // Fonction mongoose qui qppelle le nouveau modèle/schema de produits pour effectuer l'opération insertMany (ajouter).
+      // Ces produits parseJSON seront ajoutés dans la collection 'products' de mongoDb avec l'ensemble de leurs attrituts recueillit dans productDataText.
+      await productNewModel.insertMany(productsToInsert);
+      console.log(`${productsToInsert.length} produits insérés avec succès.`);
+    } else {
+      console.log('Aucun nouveau produits a ajouté trouvé (ils ont tous m_sNoProduit dupliqué).');
+    }
+  } catch (error) {
+    console.error("Error processing product data:", error);
+  }
+};
