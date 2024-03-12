@@ -145,7 +145,7 @@ exports.createProductByTextFile = async (req, res) => {
       await productNewModel.insertMany(productsToInsert);
       console.log(`MongoDB: ${productsToInsert.length} produit(s) inséré(s) avec succès.`);
     } else {
-      console.log('MongoDB: Aucun nouveau produits a ajouté trouvé (Leurs attributs "m_sNoProduit" existe déjà dans la base de donnée MongoDB).');
+      console.log('MongoDB: Aucun nouveau produit trouvé (Leurs attributs "m_sNoProduit" existe déjà dans la base de donnée MongoDB).');
     }
   } catch (error) {
     console.error("Erreur lors du traitement des données produit:", error);
