@@ -36,7 +36,7 @@ exports.getProducts = (req, res) => {
       }
     } catch (error) {
       console.error("Error decoding JWT token:", error);
-      res
+      return res
         .status(401)
         .json({ error: "Erreur d'authentification Utilisateur !" });
     }

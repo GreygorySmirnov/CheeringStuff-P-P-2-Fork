@@ -11,7 +11,6 @@ const imagesPath = path.join(__dirname, "images");
 const fsController = require('./controller/fsController')
 const cronScheduledTasks = require('./script/cronScheduledTasks')
 const cronScriptFtp = require('./script/cronScriptFtp')
-// const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -21,7 +20,10 @@ app.use(express.urlencoded({ extended: false }));
 // Middleware pour ajouter les headers CORS
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://localhost:4242",
   "https://api-cheeringstuff.onrender.com",
+  "https://cheeringstuff-p-p-2.onrender.com",
+  "https://cheering-stuff-front-end.vercel.app",
 ];
 app.use(
   cors({
