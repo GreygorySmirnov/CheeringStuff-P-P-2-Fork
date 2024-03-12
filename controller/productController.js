@@ -3,7 +3,7 @@
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.JWT_SECRET;
 const Product = require("../models/products");
-const productNewModel = require("../models/productsNewModel"); // nouveau modèle/schema de produits avec les attributs de solusoft
+const productSoluSoft = require("../models/productsNewModel"); // nouveau modèle/schema de produits avec les attributs de solusoft
 require("dotenv").config();
 const fs = require("fs");
 
@@ -129,10 +129,11 @@ exports.createProductByTextFile = async (req, res) => {
 
     // Vérifie les numéros de produit déjà existant avant de les insérer
     await Promise.all(productDataText.map(async (product) => {
-      const existingProduct = await productNewModel.findOne({ m_sNoProduit: product.m_sNoProduit });
+      const existingProduct = await productSoluSoft.findOne({ m_sNoProduit: product.m_sNoProduit });
       if (!existingProduct) {
         productsToInsert.push(product);
       } else {
+        // LES PRODUITS DÉJÀ EXISTANT DOIVENT ÊTRE UPDATER!!!!!!!
         existingProductNumbers.add(product.m_sNoProduit);
         console.warn(`MongoDB: Les produits avec l'attribut m_sNoProduit en double seront ignorés: ${product.m_sNoProduit}`);
       }
@@ -142,7 +143,7 @@ exports.createProductByTextFile = async (req, res) => {
       // Insère les produits sans duplication de l'attribut m_sNoProduit.
       // Fonction mongoose qui qppelle le nouveau modèle/schema de produits pour effectuer l'opération insertMany (ajouter).
       // Ces produits parseJSON seront ajoutés dans la collection 'products' de mongoDb avec l'ensemble de leurs attrituts recueillit dans productDataText.
-      await productNewModel.insertMany(productsToInsert);
+      await productSoluSoft.insertMany(productsToInsert);
       console.log(`MongoDB: ${productsToInsert.length} produit(s) inséré(s) avec succès.`);
     } else {
       console.log('MongoDB: Aucun nouveau produit trouvé (Leurs attributs "m_sNoProduit" existe déjà dans la base de donnée MongoDB).');
