@@ -8,10 +8,10 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 const imagesPath = path.join(__dirname, "images");
-const fsController = require('./controller/fsController')
-const cronScheduledTasks = require('./script/cronScheduledTasks')
+const fsController = require('./controller/fsController') // Importe les fonctions du gestionnaire de fichier FS
+const cronScheduledTasks = require('./script/cronScheduledTasks') // Importe les fonctions du planificateur de tâches CRON
 const cronScriptFtp = require('./script/cronScriptFtp')
-const productController = require('./controller/productController')
+const productController = require('./controller/productController') // Importe les fonctions du productController ()
 // const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 app.use(bodyParser.urlencoded({ extended: false }));
