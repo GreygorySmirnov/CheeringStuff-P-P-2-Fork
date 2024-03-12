@@ -3,7 +3,7 @@
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.JWT_SECRET;
 const Product = require("../models/products");
-const productSoluSoft = require("../models/productsNewModel"); // nouveau modèle/schema de produits avec les attributs de solusoft
+const productSoluSoft = require("../models/productSoluSoft"); // nouveau modèle/schema de produits avec les attributs de solusoft
 require("dotenv").config();
 const fs = require("fs");
 
