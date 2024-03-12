@@ -83,7 +83,6 @@ mongoose
   });
 
 // APPEL DES SCRIPTS ET FONCTIONS AU DÉMARRAGE DE L'API
-// CRÉER DOSSIER Solusoft
-fsController.createSolusoftRootFolder();
-cronScheduledTasks.fetchProductsAndPhotosFromFtpDaily() // Renommer fetchProducts éventuellement;
-productController.createProductByTextFile();
+fsController.createSolusoftRootFolder(); // CRÉE le dossier Solusoft
+cronScheduledTasks.fetchProductsAndPhotosFromFtpDaily() // TÉLÉCHARGE les produits et photos du ftp quotidiennement;
+productController.createProductByTextFile(); // CRÉE un nouveau produit si le numéro de produit n'est pas déjà présent dans la collection 'products' de MongoDb.
