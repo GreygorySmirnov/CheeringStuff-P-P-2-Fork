@@ -124,8 +124,9 @@ exports.createProductByTextFile = async (req, res) => {
     // Fonction qui lit et converti en JSON les produits téléchargés en format txt contenu dans le dossier de réception.
     const productDataText = JSON.parse(fs.readFileSync(productTextFilePath, 'utf8'));
 
-    const productsToInsert = []; // Tableau qui contient les produits sans les dupliquer
-    const existingProductNumbers = new Set(); // Set pour conserver/enregistré les numéros de produits existant || Configurer pour stocker des numéros de produits existants uniques
+    const productsToInsert = []; // Tableau qui contiendra les produits qui n'existe pas déjà
+    const productsToUpdate = []; // Tableau qui contiendra les produits déjà existant à modifier (update)
+    const existingProductNumbers = new Set(); // Compte le nombre de produit déjà existant
 
     // Vérifie les numéros de produit déjà existant avant de les insérer
     await Promise.all(productDataText.map(async (product) => {
@@ -135,20 +136,22 @@ exports.createProductByTextFile = async (req, res) => {
       } else {
         // LES PRODUITS DÉJÀ EXISTANT DOIVENT ÊTRE UPDATER!!!!!!!
         existingProductNumbers.add(product.m_sNoProduit);
-        console.log(existingProductNumbers)
-        console.warn(`MongoDB: ${existingProductNumbers.length} produits déjà existant. Les produits avec l'attribut 'm_sNoProduit' en double seront ignorés: ${product.m_sNoProduit}`);
+        productsToUpdate.push(product);
+        console.warn(`MongoDB: ${productsToUpdate.length} produits déjà existant. Les produits avec l'attribut 'm_sNoProduit' en double seront mis à jour: ${product.m_sNoProduit}`);
       }
     }));
 
-    if (productsToInsert.length > 0) {
-      // Insère les produits sans duplication de l'attribut m_sNoProduit.
-      // Fonction mongoose qui qppelle le nouveau modèle/schema de produits pour effectuer l'opération insertMany (ajouter).
-      // Ces produits parseJSON seront ajoutés dans la collection 'products' de mongoDb avec l'ensemble de leurs attrituts recueillit dans productDataText.
-      await productSoluSoft.insertMany(productsToInsert);
+    if (productsToInsert.length > 0) { // Si la liste de produit à inséré n'est pas vide
+      await productSoluSoft.insertMany(productsToInsert); // Fonction mongoose qui qppelle le nouveau modèle/schema de produits pour effectuer l'opération insertMany (ajouter).
       console.log(`MongoDB: ${productsToInsert.length} produit(s) inséré(s) avec succès.`);
     } else {
       console.log('MongoDB: Aucun nouveau produit trouvé (Leurs attributs "m_sNoProduit" existe déjà dans la base de donnée MongoDB).');
     }
+    if (productsToUpdate.length > 0){
+      // await productSoluSoft.updateMany(productsToUpdate); // Fonction mongoose qui qppelle le nouveau modèle/schema de produits pour effectuer l'opération insertMany (ajouter).
+      console.log(`MongoDB: ${productsToUpdate.length} ont été mis à jour`);
+        } else {
+      console.log('MongoDB: Aucun nouveau produit ne nécessite une mise à jour.');}
   } catch (error) {
     console.error("Erreur lors du traitement des données produit:", error);
   }
