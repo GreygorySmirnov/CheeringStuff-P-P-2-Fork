@@ -135,7 +135,8 @@ exports.createProductByTextFile = async (req, res) => {
       } else {
         // LES PRODUITS DÉJÀ EXISTANT DOIVENT ÊTRE UPDATER!!!!!!!
         existingProductNumbers.add(product.m_sNoProduit);
-        console.warn(`MongoDB: Les produits avec l'attribut m_sNoProduit en double seront ignorés: ${product.m_sNoProduit}`);
+        console.log(existingProductNumbers)
+        console.warn(`MongoDB: ${existingProductNumbers.length} produits déjà existant. Les produits avec l'attribut 'm_sNoProduit' en double seront ignorés: ${product.m_sNoProduit}`);
       }
     }));
 
