@@ -1,5 +1,6 @@
 "use strict";
 
+require("dotenv").config();
 const User = require("../models/users");
 const Product = require("../models/products");
 const Order = require("../models/orders");

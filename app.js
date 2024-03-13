@@ -22,7 +22,11 @@ app.use(express.urlencoded({ extended: false }));
 // Middleware pour ajouter les headers CORS
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://localhost:4242",
   "https://api-cheeringstuff.onrender.com",
+  "https://cheeringstuff-p-p-2.onrender.com",
+  "https://cheeringstuff-p-p-2-vlyt.onrender.com",
+  "https://cheering-stuff-front-end.vercel.app",
 ];
 app.use(
   cors({

@@ -5,7 +5,7 @@ const authId = require('../middleware/auth_id');
 
 // CRUD des produits (Create Read Update Delete)
 // Route pour OBTENIR (read) la liste des produits (accessible par tous les utilisateurs)
-router.get('/products',   ProductController.getProducts);
+router.get('/products', ProductController.getProducts);
 
 // Route pour OBTENIR (read) un produit spécifique par son ID (accessible par un utilisateur authentifié)
 router.get('/products/:id', authId, ProductController.getProductById);
