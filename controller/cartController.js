@@ -193,6 +193,10 @@ exports.createCheckoutSession = async (req, res) => {
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: lineItems,
+      metadata: {
+        userId: userId,
+        itemsCart: cart.itemsCart,
+      },
       mode: "payment",
       shipping_address_collection: {
         allowed_countries: ["CA"], // Pays où la livraison est autorisée
@@ -201,7 +205,7 @@ exports.createCheckoutSession = async (req, res) => {
       cancel_url: "https://cheering-stuff-front-end.vercel.app/cart", // URL de redirection en cas d'annulation du paiement
     });
 
-    if (session.id) {
+    /*if (session.id) {
       // Créer la commande (Order) à partir du panier
       const newOrder = new Order({
         userId: req.user.userId,
@@ -215,7 +219,7 @@ exports.createCheckoutSession = async (req, res) => {
 
       // Sauvegarder la commande dans la collection "Orders"
       await newOrder.save();
-    }
+    }*/
 
     // Réponse avec l'URL de paiement
     res.status(200).json({ checkoutUrl: session.url });
