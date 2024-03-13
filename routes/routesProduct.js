@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const ProductController = require('../controller/productController');
 const authId = require('../middleware/auth_id');
+const ProductController = require('../controller/productController');
 
 // CRUD des produits (Create Read Update Delete)
 // Route pour OBTENIR (read) la liste des produits (accessible par tous les utilisateurs)
