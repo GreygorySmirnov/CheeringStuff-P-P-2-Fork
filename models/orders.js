@@ -41,13 +41,7 @@ const orderSchema = new Schema(
       type: Object,
       required: false,
     },
-    // Statut de la commande
-    status: {
-      type: String,
-      enum: ["pending", "confirmed"],
-      default: "pending",
-      required: true,
-    },
+    // Statut si la commande a été transférée dans le ftp
     transfered: {
       type: Boolean,
       default: false,

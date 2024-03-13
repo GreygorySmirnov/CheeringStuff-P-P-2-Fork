@@ -196,31 +196,15 @@ exports.createCheckoutSession = async (req, res) => {
       line_items: lineItems,
       metadata: {
         userId: userId,
-        itemsCart: cart.itemsCart,
+        itemsCart: JSON.stringify(cart.itemsCart),
       },
       mode: "payment",
       shipping_address_collection: {
         allowed_countries: ["CA"], // Pays où la livraison est autorisée
       },
-      success_url: "http://localhost:3000/", // URL de redirection après le paiement réussi https://cheering-stuff-front-end.vercel.app
-      cancel_url: "http://localhost:3000/cart", // URL de redirection en cas d'annulation du paiement https://cheering-stuff-front-end.vercel.app/cart
+      success_url: "https://cheering-stuff-front-end.vercel.app", // URL de redirection après le paiement réussi https://cheering-stuff-front-end.vercel.app
+      cancel_url: "https://cheering-stuff-front-end.vercel.app/cart", // URL de redirection en cas d'annulation du paiement https://cheering-stuff-front-end.vercel.app/cart
     });
-
-    /*if (session.id) {
-      // Créer la commande (Order) à partir du panier
-      const newOrder = new Order({
-        userId: req.user.userId,
-        stripeCheckoutId: session.id,
-        itemsCart: cart.itemsCart.map((item) => ({
-          productId: item.product,
-          quantity: item.quantity,
-        })),
-        status: "pending",
-      });
-
-      // Sauvegarder la commande dans la collection "Orders"
-      await newOrder.save();
-    }*/
 
     // Réponse avec l'URL de paiement
     res.status(200).json({ checkoutUrl: session.url });

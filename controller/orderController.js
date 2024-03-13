@@ -71,7 +71,8 @@ exports.stripeConfrimOrder = async (req, res) => {
       // Create the order
       const order = new Order({
         userId: checkoutSession.metadata.userId,
-        itemsCart: checkoutSession.metadata.itemsCart.map((item) => ({
+        // Parse the itemsCart from the metadata
+        itemsCart: JSON.parse(checkoutSession.metadata.itemsCart).map((item) => ({
           productId: item.product,
           quantity: item.quantity,
         })),
@@ -88,6 +89,7 @@ exports.stripeConfrimOrder = async (req, res) => {
 
       // Save the order
       await order.save();
+      console.log(`Order ${order._id} has been created`);
 
       // Delete the cart
       const deletedCart = await Cart.findOneAndRemove({ userId: order.userId });
