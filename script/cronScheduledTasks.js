@@ -1,7 +1,8 @@
 // Function FTP Connexion / Download / Download
 exports.fetchProductsAndPhotosFromFtpDaily = (req, res) => {
-    const cron = require('node-cron');// MODULES DE DÉPENDANCES (inclusion): Planificateur CRON, Librairie FTP, Gestionnaire de fichier FS, Gestionnaire de téléchargement AdmZip
-    const ftpController = require('../controller/ftpController')     // Importer le script ftpController pour accéder à la fonction ftpGet.js
+    // MODULES DE DÉPENDANCES NODE.JS (importation)
+    const cron = require('node-cron'); // Planificateur de tâches CRON
+    const ftpController = require('../controller/ftpController') // Importe les fonctions du ftpController ()
 
     // CRON SCRIPT - Exécution du script planifié (Référence: https://crontab.guru/#0_*/1_*_*_*)
     // cron.schedule('*/1 * * * *', function () { // MODE TEST (À TOUTES LES MINUTES): */1 * * * *
@@ -10,6 +11,5 @@ exports.fetchProductsAndPhotosFromFtpDaily = (req, res) => {
     // })
 
     // MODE TEST: APPEL LA FONCTION de téléchargement de produits dans ftpController INSTANNÉMENT (pour TESTER et pour le bouton fetch, si nécessaire)
-    ftpController.fetchProductsAndPhotosFromFtpDaily();
-    // mongoDbController.parseNewProductsToJson
+    ftpController.fetchProductsAndPhotosFromFtpDaily(); // TÉLÉCHARGE les produits et les photos du FTP quotidiennement
 }
