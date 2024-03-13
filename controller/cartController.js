@@ -201,8 +201,8 @@ exports.createCheckoutSession = async (req, res) => {
       shipping_address_collection: {
         allowed_countries: ["CA"], // Pays où la livraison est autorisée
       },
-      success_url: "https://cheering-stuff-front-end.vercel.app", // URL de redirection après le paiement réussi
-      cancel_url: "https://cheering-stuff-front-end.vercel.app/cart", // URL de redirection en cas d'annulation du paiement
+      success_url: "http://localhost:3000/", // URL de redirection après le paiement réussi https://cheering-stuff-front-end.vercel.app
+      cancel_url: "http://localhost:3000/cart", // URL de redirection en cas d'annulation du paiement https://cheering-stuff-front-end.vercel.app/cart
     });
 
     /*if (session.id) {
