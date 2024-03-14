@@ -422,3 +422,54 @@ exports.toggleUserActivation = (req, res) => {
       });
     });
 };
+// Fonction pour activer ou desactiver un compte utilisateur isBusness
+exports.toggleUserIsBusiness = (req, res) => {
+  // Récupérer l'id de l'utilisateur à activer/désactiver depuis les paramètres de la requête
+  const userIdToToggle = req.params.id;
+
+  // Recherche l'utilisateur dans la base de données par son id
+  User.findById(userIdToToggle)
+    .then((user) => {
+      // Vérifie si l'utilisateur existe
+      if (!user) {
+        // Renvoi une réponse d'erreur si l'utilisateur n'est pas trouvé
+        return res.status(404).json({ error: "Utilisateur introuvable." });
+      }
+
+      // Bascule le status isBusiness de l'utilisateur
+      user.isBusiness = !user.isBusiness;
+
+      // Détermine l'action effectuée (activation ou désactivation)
+      const action = user.isBusiness ? "Entreprise" : "Particulier";
+
+      // Enregistrer les modifications dans la base de données
+      user
+        .save()
+        .then(() => {
+          // Renvoi une réponse de succès avec un message indiquant l'action effectuée
+          res.status(200).json({
+            message: `Le profil de l'utilisateur a été marqué comme ${action} avec succès.`,
+          });
+        })
+        .catch((error) => {
+          // Gère les erreurs lors de l'enregistrement des modifications dans la base de données
+          console.error(
+            `Erreur lors de la ${action} du profil d'utilisateur :`,
+            error
+          );
+          // Renvoi une réponse d'erreur avec un code 500
+          res.status(500).json({
+            error: `Une erreur s'est produite lors de la ${action} du profil de l'utilisateur.`,
+          });
+        });
+    })
+    .catch((error) => {
+      // Gère les erreurs lors de la recherche de l'utilisateur dans la base de données
+      console.error("Erreur lors de la recherche de l'utilisateur :", error);
+      // Renvoi une réponse d'erreur avec un code 500
+      res.status(500).json({
+        error:
+          "Une erreur s'est produite lors de la recherche de l'utilisateur.",
+      });
+    });
+};
