@@ -1,10 +1,10 @@
 "use strict";
 
+require("dotenv").config();
 const jwt = require("jsonwebtoken");
 const secretKey = process.env.JWT_SECRET;
 const Product = require("../models/products");
 const productSoluSoft = require("../models/productSoluSoft"); // nouveau modèle/schema de produits avec les attributs de solusoft
-require("dotenv").config();
 const fs = require("fs");
 
 // Fonction qui récupère et liste tous les produits de la base de données
@@ -38,7 +38,7 @@ exports.getProducts = (req, res) => {
       }
     } catch (error) {
       console.error("Error decoding JWT token:", error);
-      res
+      return res
         .status(401)
         .json({ error: "Erreur d'authentification Utilisateur !" });
     }
@@ -118,10 +118,10 @@ exports.getProductById = (req, res) => {
 
 // createProductByTextFile: Création d'un nouveau produit dans la collection 'products' de MongoDb. (s'il n'existe pas déjà)
 exports.createProductByTextFile = async (req, res) => {
-  const fetchedProductsTxtFile = './solusoft/ftpReceivedFiles/Produits/20240228_08271080_Produit.txt';
+  const fetchedProductsTxtFilePath = './solusoft/ftpReceivedFiles/Produits/20240228_08271080_Produit.txt';
 
   try {
-    let parseProductTxtFile = fs.readFileSync(fetchedProductsTxtFile, 'utf8')
+    let parseProductTxtFile = fs.readFileSync(fetchedProductsTxtFilePath, 'utf8')
     const productsJsonData = JSON.parse(parseProductTxtFile); // readFileSync (module FS): analyse le fichier *produit.txt et convertit objet JSON
     const productsToInsert = []; // Tableau qui contient les produits sans les dupliquer (m_eIDProduit n'est pas déjà présent dans la collection)
     const productsToUpdate = []; // Tableau qui contient les produits à mettre à jour (m_eIDProduit est déjà présent dans la colleciton)
