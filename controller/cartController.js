@@ -177,7 +177,8 @@ exports.createCheckoutSession = async (req, res) => {
           product_data: {
             name: product.DESCFRA,
           },
-          unit_amount: product.PRIX4 * 100, // Convertir le prix en centimes
+          // Convertir le prix en centimes
+          unit_amount: (product.PRIX4 * 100).toFixed(0),
         },
         quantity: item.quantity,
       });
@@ -202,8 +203,8 @@ exports.createCheckoutSession = async (req, res) => {
       shipping_address_collection: {
         allowed_countries: ["CA"], // Pays où la livraison est autorisée
       },
-      success_url: "https://cheering-stuff-front-end.vercel.app", // URL de redirection après le paiement réussi https://cheering-stuff-front-end.vercel.app
-      cancel_url: "https://cheering-stuff-front-end.vercel.app/cart", // URL de redirection en cas d'annulation du paiement https://cheering-stuff-front-end.vercel.app/cart
+      success_url: "https://cheering-stuff-front-end-swart.vercel.app", // URL de redirection après le paiement réussi https://cheering-stuff-front-end.vercel.app
+      cancel_url: "https://cheering-stuff-front-end-swart.vercel.app/cart", // URL de redirection en cas d'annulation du paiement https://cheering-stuff-front-end.vercel.app/cart
     });
 
     // Réponse avec l'URL de paiement

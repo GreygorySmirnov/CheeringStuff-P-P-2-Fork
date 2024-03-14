@@ -33,6 +33,13 @@ router.put(
   userController.toggleUserActivation
 );
 
+// Route pour désactiver ou réactiver un utilisateur (Business Account) (accessible par un administrateur)
+router.put(
+  "/users/:id/businessAccount",
+  authAdmin,
+  userController.toggleUserIsBusiness
+);
+
 // Route pour la réinitialisation du mot de passe
 router.post("/resetpassword", userController.forgotPassword);
 
