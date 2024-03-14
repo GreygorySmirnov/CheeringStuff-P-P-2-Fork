@@ -118,37 +118,34 @@ exports.getProductById = (req, res) => {
 
 // createProductByTextFile: Création d'un nouveau produit dans la collection 'products' de MongoDb. (s'il n'existe pas déjà)
 exports.createProductByTextFile = async (req, res) => {
-  const fetchedProductsTxtFile = './solusoft/ftpReceivedFiles/Produits/20240228_08271080_Produit.txt';
+  const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/20240228_08271080_Produit.txt';
 
   try {
-    const productsJsonData = JSON.parse(fs.readFileSync(fetchedProductsTxtFile, 'utf8')); // Fonction readFileSync du module FS qui lit un fichier TXT et l'analyse en objet JSON (JSON.parse).
+    const productDataJson = JSON.parse(fs.readFileSync(productTextFilePath, 'utf8'));// Fonction qui lit et crée un talbeau JSON les produits téléchargés en format txt contenu dans le dossier de réception.
     const productsToInsert = []; // Tableau qui contient les produits sans les dupliquer (m_sNoProduit n'est pas déjà présent dans la collection)
     const productsToUpdate = []; // Tableau qui contient les produits à mettre à jour (m_sNoProduit est déjà présent dans la colleciton)
     const existingProductNumbers = new Set(); // Conserve les m_sNoProduit déjà existants dans la collection 'products' de MongoDB
 
     // Vérifie les numéros de produit déjà existant avant de les insérer
-    for (const product of productsJsonData) { // Parcours tout les produits à l'intérieur du tableau productsJsonData et crée une promesse/retour pour tout les produits trouvés
-      const existingProduct = await productSoluSoft.findOne({ m_sNoProduit: product.m_sNoProduit }); // findOne itère sur les produits dans l'objet JSON et vérifie pour chaque produit s'il existe déjà dans la collection 'products'. Si un produit avec le même attribut m_sNoProduit est trouvé, le produit est ajouté au tableau productsToUpdate. Sinon, il est ajouté au tableau productsToInsert.
+    await Promise.all(productDataJson.map(async (product) => { // Parcours tout les produits à l'intérieur du tableau productDataJson et crée une promesse/retour pour tout les produits trouvés
+      const existingProduct = await productSoluSoft.findOne({ m_sNoProduit: product.m_sNoProduit }); // Vérifie si il existe des attributs m_sNoProduit concordant entre le tableau et la collection
 
       if (!existingProduct) { // Si la variable existingProduct est vide...
         productsToInsert.push(product); // Ajouter le produit dans la variable productsToInsert.
       } else {
-        productsToUpdate.push(product); // Ajouter le produit dans la variable productsToInsert.
         existingProductNumbers.add(product.m_sNoProduit);
         console.warn(`MongoDB: Les produits avec l'attribut m_sNoProduit en double seront ignorés: ${product.m_sNoProduit}`);
       }
-    }
+      if (existingProduct) { // Si la variable existingProduct est vide...
+        productsToUpdate.push(product); // Ajouter le produit dans la variable productsToInsert.
+        console.log(('LISTE DES PRODUITS À UPDATER')+(productsToUpdate))
+        console.log(JSON.stringify(productsToUpdate, null, 2));
+      } else {
+        existingProductNumbers.add(product.m_sNoProduit);
+        console.warn(`MongoDB: WARNING productsToUpdate a corriger: ${product.m_sNoProduit}`);
+      }
+    }));
 
-    if (productsToUpdate.length > 0) {
-      // await productSoluSoft.updateMany({}, { $set: { m_eIDProduit: 12345 } })
-      await productSoluSoft.updateMany({},
-        // PROBLÈME: BESOIN D'UNE BOUCLE POUR [0] ET SEULEMENT CAPABLE D'UPDATER UN ATTRIBUT SÉLECTIONNÉ (ici m_sDescFra)
-        { $set: { m_sDescFra: productsToUpdate[0].m_sDescFra } },
-        )
-        // { $set: {  } })
-      console.log(`LIGNE 150 MongoDB: ${productsToUpdate.length} produit(s) modifié(s) avec succès.`);
-    }
- 
     if (productsToInsert.length > 0) { // FONCTION qui s'exécutera si le tableau de produits à a inséré n'est pas vide. (ligne 135)
       await productSoluSoft.insertMany(productsToInsert); // Ajoute les produts à inséré dans la collection 'products' de MongoDB
       console.log(`MongoDB: ${productsToInsert.length} produit(s) inséré(s) avec succès.`);
@@ -156,8 +153,16 @@ exports.createProductByTextFile = async (req, res) => {
       console.log('MongoDB: Aucun nouveau produit trouvé (Leurs attributs "m_sNoProduit" existe déjà dans la base de donnée MongoDB).');
     }
 
-  }
-  catch (error) {
+    if (productsToUpdate.length > 0) { // FONCTION qui s'exécutera si le tableau de produits à a inséré n'est pas vide. (ligne 135)
+      //console.log(productsToUpdate)
+      console.log(('LISTE #2 DES PRODUITS À UPDATER: ')+(productsToUpdate[0]))
+
+      await productSoluSoft.updateMany(productsToUpdate);
+      console.log(`MongoDB: ${Product.length} produit(s) modifié(s) avec succès.`);
+    } else {
+      console.log('MongoDB: PRODUCT TO UPDATE ELSE ERROR MESSAGE');
+    }
+  } catch (error) {
     console.error("Erreur lors du traitement des données produit:", error);
   }
-}
+};
