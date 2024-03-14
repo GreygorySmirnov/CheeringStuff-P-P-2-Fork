@@ -6,5 +6,5 @@ exports.ftpCronConnect = (req, res) => {
 
     // EXÉCUTION DES SCRIPTS importOrders + exportOrdersToFTP
     scriptOrders.importOrders();
-    //scriptOrders.exportOrdersToFTP();
+    scriptOrders.exportOrdersToFTP();
 }
