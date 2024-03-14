@@ -58,6 +58,18 @@ const userSchema = new Schema(
       type: Boolean,
       default: true, // Valeur par défaut si le champ n'est pas défini lors de la création
     },
+    // Statut de compte Business de l'utilisateur (true s'il est Business Account, false sinon)
+    isBusiness: {
+      type: Boolean,
+      default: false, // Valeur par défaut si le champ n'est pas défini lors de la création
+    },
+    // Nom de l'entreprise (si le compte est un Business Account)
+    businessName: {
+      type: String,
+      required: false, // Le champ n'est pas obligatoire
+      minlength: 1, // Longueur minimale du nom de l'entreprise
+      maxlength: 50 // Longueur maximale du nom de l'entreprise
+    },
   },
   { timestamps: true }
 );
