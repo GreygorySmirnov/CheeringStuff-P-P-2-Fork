@@ -79,7 +79,7 @@ exports.stripeConfrimOrder = async (req, res) => {
           })
         ),
         totalAmount: checkoutSession.amount_total / 100,
-        shipping: checkoutSession.shipping,
+        shipping: checkoutSession.shipping_details,
       });
 
       // Save the order
