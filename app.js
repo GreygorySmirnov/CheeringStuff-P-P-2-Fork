@@ -8,9 +8,10 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const path = require("path");
 const imagesPath = path.join(__dirname, "images");
-const fsController = require('./controller/fsController')
-const cronScheduledTasks = require('./script/cronScheduledTasks')
+const fsController = require('./controller/fsController') // Importe les fonctions du gestionnaire de fichier FS
+const cronScheduledTasks = require('./script/cronScheduledTasks') // Importe les fonctions du planificateur de tâches CRON
 const cronScriptFtp = require('./script/cronScriptFtp')
+const productController = require('./controller/productController') // Importe les fonctions du productController ()
 // const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY)
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -21,7 +22,12 @@ app.use(express.urlencoded({ extended: false }));
 // Middleware pour ajouter les headers CORS
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://localhost:4242",
   "https://api-cheeringstuff.onrender.com",
+  "https://cheeringstuff-p-p-2.onrender.com",
+  "https://cheeringstuff-p-p-2-vlyt.onrender.com",
+  "https://cheering-stuff-front-end.vercel.app",
+  "https://dashboard.stripe.com",
 ];
 app.use(
   cors({
@@ -82,6 +88,6 @@ mongoose
   });
 
 // APPEL DES SCRIPTS ET FONCTIONS AU DÉMARRAGE DE L'API
-// CRÉER DOSSIER Solusoft
-fsController.createSolusoftRootFolder()
-cronScheduledTasks.fetchProductsAndPhotosFromFtpDaily() // Renommer fetchProducts éventuellement
+fsController.createSolusoftRootFolder(); // CRÉE le dossier Solusoft
+cronScheduledTasks.fetchProductsAndPhotosFromFtpDaily() // TÉLÉCHARGE les produits et photos du ftp quotidiennement;
+productController.createProductByTextFile(); // CRÉE un nouveau produit si le numéro de produit n'est pas déjà présent dans la collection 'products' de MongoDb.

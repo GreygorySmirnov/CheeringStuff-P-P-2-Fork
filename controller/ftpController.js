@@ -1,9 +1,9 @@
-// FTPGET :Fonctions exécutant l'ensemble des fonctionnalités pour récupérer le contenu ajouté des dossiers images et produits du serveur FTP
+// fetchProductsAndPhotosFromFtpDaily :Fonctions exécutant l'ensemble des fonctionnalités pour récupérer le contenu ajouté des dossiers images et produits du serveur FTP
 exports.fetchProductsAndPhotosFromFtpDaily = async (req, res) => {
-    // MODULES DE DÉPENDANCES (intégration): Librairies FTP, Gestionnaire de fichier FS, Gerstionnaire de décompression AdmZip)
-    const basicFtp = require('basic-ftp'); // Module Gestionnaire d'interactions avec le serveur FTP
-    const zipController = require('../controller/zipController');
-    const fsController = require('../controller/fsController')
+    // MODULES DE DÉPENDANCES NODE.JS (importation)
+    const basicFtp = require('basic-ftp'); // Librairies Basic FTP
+    const zipController = require('../controller/zipController'); // Gerstionnaire de décompression AdmZip
+    const fsController = require('../controller/fsController') // // Gestionnaire de fichier FS
 
     // EXÉCUTER LES FONCTIONS CRÉATIONS DE DOSSIERS LOCAUX ET DISTANT FTP (PRODUITS + PHOTOS)
     fsController.createProductsFolder();

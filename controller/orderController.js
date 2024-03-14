@@ -68,33 +68,37 @@ exports.stripeConfrimOrder = async (req, res) => {
     const checkoutSession = event.data.object;
 
     try {
-      // Update the order
-      const order = await Order.findOneAndUpdate(
-        { stripeCheckoutId: checkoutSession.id },
-        {
-          status:
-            event.type === "checkout.session.completed"
-              ? "confirmed"
-              : "expired",
-          shipping: checkoutSession.shipping_details,
-          totalAmount: checkoutSession.amount_total / 100,
-        }
-      );
+      // Create the order
+      const order = new Order({
+        userId: checkoutSession.metadata.userId,
+        // Parse the itemsCart from the metadata
+        itemsCart: JSON.parse(checkoutSession.metadata.itemsCart).map((item) => ({
+          productId: item.product,
+          quantity: item.quantity,
+        })),
+        /*payment: {
+          stripeCheckoutSessionId: checkoutSession.id,
+          paymentMethod: checkoutSession.payment_method_types[0],
+          paymentStatus: checkoutSession.payment_status,
+          cardBrand: checkoutSession.payment_method_details.card.brand,
+          cardNumber: checkoutSession.payment_method_details.card.last4,
+        },*/
+        totalAmount: checkoutSession.amount_total / 100,
+        shipping: checkoutSession.shipping,
+      });
 
-      if (order) {
-        console.log(
-          `Order ${order._id} has been ${
-            event.type === "checkout.session.completed"
-              ? "confirmed"
-              : "expired"
-          }`
-        );
+      // Save the order
+      await order.save();
+      console.log(`Order ${order._id} has been created`);
 
-        // Delete the cart
-        await Cart.findOneAndRemove({ userId: order.userId });
-      }
+      // Delete the cart
+      const deletedCart = await Cart.findOneAndRemove({ userId: order.userId });
+      console.log(`Cart ${deletedCart._id} has been deleted`);
     } catch (error) {
-      console.error("Error while updating order status", error);
+      console.error("An error occurred while creating the order", error);
+      return res.status(500).json({
+        error: "An error occurred while creating the order",
+      });
     }
   }
 
