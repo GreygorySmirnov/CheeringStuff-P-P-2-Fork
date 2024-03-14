@@ -107,7 +107,7 @@ exports.fetchProductsAndPhotosFromFtpDaily = async (req, res) => {
     }
 
     // APPEL FONCTIONS DE TÉLÉCHARGEMENTS (produits + photos)
-    fetchRemoteFtpProductsFiles();
-    fetchRemoteFtpPhotosFiles();
+    await fetchRemoteFtpProductsFiles();
+    await fetchRemoteFtpPhotosFiles();
     productController.createProductByTextFile(); // CRÉE un nouveau produit si le numéro de produit n'est pas déjà présent dans la collection 'products' de MongoDb.
 }
