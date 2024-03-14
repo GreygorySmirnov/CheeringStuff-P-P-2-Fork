@@ -2,8 +2,9 @@
 exports.fetchProductsAndPhotosFromFtpDaily = async (req, res) => {
     // MODULES DE DÉPENDANCES NODE.JS (importation)
     const basicFtp = require('basic-ftp'); // Librairies Basic FTP
-    const zipController = require('../controller/zipController'); // Gerstionnaire de décompression AdmZip
-    const fsController = require('../controller/fsController') // // Gestionnaire de fichier FS
+    const zipController = require('./zipController'); // Gerstionnaire de décompression AdmZip
+    const fsController = require('./fsController') // // Gestionnaire de fichier FS
+    const productController = require('./productController')
 
     // EXÉCUTER LES FONCTIONS CRÉATIONS DE DOSSIERS LOCAUX ET DISTANT FTP (PRODUITS + PHOTOS)
     fsController.createProductsFolder();
@@ -108,4 +109,5 @@ exports.fetchProductsAndPhotosFromFtpDaily = async (req, res) => {
     // APPEL FONCTIONS DE TÉLÉCHARGEMENTS (produits + photos)
     fetchRemoteFtpProductsFiles();
     fetchRemoteFtpPhotosFiles();
+    productController.createProductByTextFile(); // CRÉE un nouveau produit si le numéro de produit n'est pas déjà présent dans la collection 'products' de MongoDb.
 }
