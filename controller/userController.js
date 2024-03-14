@@ -7,14 +7,39 @@ const transporter = require("../services/nodemailer");
 
 // Fonction de création de l'utilisateur (sign up)
 exports.getAddUser = (req, res, next) => {
+  var valide = true;
+  var error = [];
   const { email, firstname, lastname, city, password } = req.body;
 
   // Vérifier si le mot de passe est assez long
-  if (password.length < 6) {
+  if (password.length < 10) {
     // Renvoyer une réponse d'erreur si le mot de passe est trop court
-    return res
-      .status(400)
-      .json({ error: "Le mot de passe doit contenir au moins 6 caractères." });
+    valide = false;
+    error.push("Le mot de passe doit contenir au moins 10 caractères.");
+  }
+  // Vérifier si le mot de passe contient au moins un chiffre
+  if (!/\d/.test(password)) {
+    valide = false;
+    error.push("Le mot de passe doit contenir au moins un chiffre.");
+  }
+  // Vérifier si le mot de passe contient au moins une lettre majuscule
+  if (!/[A-Z]/.test(password)) {
+    valide = false;
+    error.push("Le mot de passe doit contenir au moins une lettre majuscule.");
+  }
+  // Vérifier si le mot de passe contient au moins une lettre minuscule
+  if (!/[a-z]/.test(password)) {
+    valide = false;
+    error.push("Le mot de passe doit contenir au moins une lettre minuscule.");
+  }
+  // Vérifier si le mot de passe contient au moins un caractère spécial
+  if (!/\W/.test(password)) {
+    valide = false;
+    error.push("Le mot de passe doit contenir au moins un caractère spécial.");
+  }
+
+  if (valide === false) {
+    return res.status(400).json({ error: error });
   }
 
   // Générer un hachage du mot de passe avec bcrypt
@@ -95,13 +120,11 @@ exports.loginUser = (req, res) => {
           // Renvoi le token et un message de succès
           const token = jwt.sign(payload, secretKey, { expiresIn: "240h" }); // remettre a 1h par la suite apres test
           // Renvoi la réponse avec le token et isAdmin
-          res
-            .status(200)
-            .json({
-              token,
-              isAdmin: user.isAdmin,
-              message: `Vous êtes bien connecté ${user.firstname}!`,
-            });
+          res.status(200).json({
+            token,
+            isAdmin: user.isAdmin,
+            message: `Vous êtes bien connecté ${user.firstname}!`,
+          });
         })
         .catch((error) => {
           // Gère les erreurs lors de la comparaison du mot de passe
@@ -173,7 +196,9 @@ exports.getUserById = (req, res) => {
 // Fonction pour récupérer le profil de l'utilisateur authentifié
 exports.getUserProfil = (req, res) => {
   if (!req.user) {
-    return res.status(401).json({ error: "Vous n'êtes pas autorisé à accéder à ce profil." });
+    return res
+      .status(401)
+      .json({ error: "Vous n'êtes pas autorisé à accéder à ce profil." });
   }
   // Récupère l'identifiant de l'utilisateur authentifié
   const userId = req.user.userId;
@@ -229,10 +254,11 @@ exports.updateUser = (req, res) => {
       .json({ error: "Vous n'êtes pas autorisé à modifier ce profil." });
   }
 
+  var error = [];
   // Vérifie le mot de passe actuel de l'utilisateur
   User.findById(userIdToUpdate).then((user) => {
     bcrypt
-    // Compare le mot de passe actuel de l'utilisateur avec le mot de passe fourni
+      // Compare le mot de passe actuel de l'utilisateur avec le mot de passe fourni
       .compare(req.body.currentPassword, user.password)
       .then((isMatch) => {
         if (!isMatch) {
@@ -243,11 +269,43 @@ exports.updateUser = (req, res) => {
 
         // Si un nouveau mot de passe est fourni, générer un hash pour le nouveau mot de passe
         if (req.body.newPassword) {
-          if(req.body.newPassword.length < 6) {
-            return res
-              .status(400)
-              .json({ error: "Le mot de passe doit contenir au moins 6 caractères." });
+          // Vérifier si le mot de passe est assez long
+          if (req.body.newPassword.length < 10) {
+            // Renvoyer une réponse d'erreur si le mot de passe est trop court
+            valide = false;
+            error.push("Le mot de passe doit contenir au moins 10 caractères.");
           }
+          // Vérifier si le mot de passe contient au moins un chiffre
+          if (!/\d/.test(req.body.newPassword)) {
+            valide = false;
+            error.push("Le mot de passe doit contenir au moins un chiffre.");
+          }
+          // Vérifier si le mot de passe contient au moins une lettre majuscule
+          if (!/[A-Z]/.test(req.body.newPassword)) {
+            valide = false;
+            error.push(
+              "Le mot de passe doit contenir au moins une lettre majuscule."
+            );
+          }
+          // Vérifier si le mot de passe contient au moins une lettre minuscule
+          if (!/[a-z]/.test(req.body.newPassword)) {
+            valide = false;
+            error.push(
+              "Le mot de passe doit contenir au moins une lettre minuscule."
+            );
+          }
+          // Vérifier si le mot de passe contient au moins un caractère spécial
+          if (!/\W/.test(req.body.newPassword)) {
+            valide = false;
+            error.push(
+              "Le mot de passe doit contenir au moins un caractère spécial."
+            );
+          }
+
+          if (valide === false) {
+            return res.status(400).json({ error: error });
+          }
+
           // Générer le hash du nouveau mot de passe avec bcrypt
           bcrypt.hash(req.body.newPassword, 12, (error, hash) => {
             if (error) {
@@ -261,10 +319,10 @@ exports.updateUser = (req, res) => {
                   "Une erreur s'est produite lors de la mise à jour du profil de l'utilisateur.",
               });
             }
-      
+
             // Remplace le mot de passe en clair par le hash dans req.body
             req.body.password = hash;
-      
+
             // Appel de la fonction pour mettre à jour le profil de l'utilisateur
             updateUserProfil();
           });
@@ -283,7 +341,7 @@ exports.updateUser = (req, res) => {
             "Une erreur s'est produite lors de la mise à jour du profil de l'utilisateur.",
         });
       });
-  })
+  });
 
   // Fonction pour mettre à jour le profil de l'utilisateur
   function updateUserProfil() {
