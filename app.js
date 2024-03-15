@@ -74,17 +74,17 @@ mongoose
   )
   .then(() => {
     console.log(
-      "La connexion à la base de données est établie, http://localhost:4242"
+      "Mongoose: La connexion à la base de données est établie, http://localhost:4242"
     );
 
     app.listen(4242, () => {
-      console.log("Le serveur écoute sur le port 4242");
+      console.log("Mongoose: Le serveur écoute sur le port 4242");
     });
     // cronScriptFtp est désactivé pour prévenir la multiplication des fichiers orders dans le dossier "parseOrdersFiles" et sur le serveur FTP.
     // cronScriptFtp.ftpCronConnect(); // devra être déplacer dans cronScheduledTasks programmé 1x par heure: (0 */1 * * *)
   })
   .catch((err) => {
-    console.log("La connexion à la base de données a échoué", err);
+    console.log("Mongoose: La connexion à la base de données a échoué", err);
   });
 
 // APPEL DES SCRIPTS ET FONCTIONS AU DÉMARRAGE DE L'API
