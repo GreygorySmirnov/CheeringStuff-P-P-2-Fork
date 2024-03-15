@@ -80,8 +80,8 @@ mongoose
     app.listen(4242, () => {
       console.log("Le serveur écoute sur le port 4242");
     });
-    // EXÉCUTION DE FN de cronScriptFtp >>> cronScriptFtp DOIT ÊTRE RENOMMÉ! >>> fetchOrdersFromMongo.js + refaire le import en haut
-    // cronScriptFtp.ftpCronConnect(); // désactivé par défaut dans le repo pour prévenir la création des fichiers orders du dossier "parseOrdersFiles".
+    // cronScriptFtp est désactivé pour prévenir la multiplication des fichiers orders dans le dossier "parseOrdersFiles" et sur le serveur FTP.
+    // cronScriptFtp.ftpCronConnect(); // devra être déplacer dans cronScheduledTasks programmé 1x par heure: (0 */1 * * *)
   })
   .catch((err) => {
     console.log("La connexion à la base de données a échoué", err);

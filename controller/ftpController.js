@@ -29,7 +29,6 @@ exports.fetchProductsAndPhotosFromFtpDaily = async (req, res) => {
                 const remoteProductsDir = '/Produits/A traiter';
                 // TÉLÉCHARGEMENT DES PRODUITS (dossier '/Produits/A traiter' du serveur FTP)
                 const productFilesList = await solusoftFTP.list(remoteProductsDir);
-                console.log(remoteProductsDir)
                 for (const productFile of productFilesList) {
                     if (productFile.isDirectory) {
                         continue; // Ignorer les répertoires
@@ -41,10 +40,10 @@ exports.fetchProductsAndPhotosFromFtpDaily = async (req, res) => {
                     // BASIC-FTP DOWNLOADTO - TÉLÉCHARGEMENT DES PRODUITS CIBLÉS (lisaison Serveur vers Local)
                     await solusoftFTP.downloadTo(localProductsPath, remoteProductsPath);
                 }
-                console.log('Les produits ont été téléchargé avec succès!');
+                console.log('BasicFTP: Les produits ont été téléchargé avec succès!');
                 // GESTION ERREUR DE TÉLÉCHARGEMENTS DES PRODUITS
             } catch (error) {
-                console.log("Erreur lors du téléchargement du dossier des produits")
+                console.log("BasicFTP: Erreur lors du téléchargement du dossier des produits")
             }
 
             // GESTION ERREUR DE CONNEXION AU SERVEUR FTP
@@ -75,7 +74,6 @@ exports.fetchProductsAndPhotosFromFtpDaily = async (req, res) => {
                 const remotePhotosDir = '/Photos/A traiter';
                 // TÉLÉCHARGEMENT DES PHOTOS (dossier '/Photos/A traiter' du serveur FTP)
                 const photoFilesList = await solusoftFTP.list(remotePhotosDir);
-                console.log(remotePhotosDir);
                 for (const photoFiles of photoFilesList) {
                     if (photoFiles.isDirectory) {
                         continue; // Ignorer les dossiers
@@ -87,7 +85,7 @@ exports.fetchProductsAndPhotosFromFtpDaily = async (req, res) => {
                     // DOWNLOADING TARGETED PHOTOS (Server to Local link)
                     await solusoftFTP.downloadTo(localPhotosPath, remotePhotosPath);
                 }
-                console.log('Les photos ont été téléchargé avec succès!');
+                console.log('BasicFTP: Les photos ont été téléchargé avec succès!');
 
 
                 // APPELLE la fonction d'extraction de fichier dans zipController
@@ -109,5 +107,5 @@ exports.fetchProductsAndPhotosFromFtpDaily = async (req, res) => {
     // APPEL FONCTIONS DE TÉLÉCHARGEMENTS (produits + photos)
     await fetchRemoteFtpProductsFiles();
     await fetchRemoteFtpPhotosFiles();
-    productController.createProductByTextFile(); // CRÉE un nouveau produit si le numéro de produit n'est pas déjà présent dans la collection 'products' de MongoDb.
+    productController.createOrUpdateProductByTextFile(); // CRÉE un nouveau produit si le numéro de produit n'est pas déjà présent dans la collection 'products' de MongoDb.
 }

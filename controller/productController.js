@@ -116,8 +116,8 @@ exports.getProductById = (req, res) => {
 };
 
 
-// createProductByTextFile: Création d'un nouveau produit dans la collection 'products' de MongoDb. (s'il n'existe pas déjà)
-exports.createProductByTextFile = async (req, res) => {
+// Création ou modification d'un nouveau produit dans la collection 'products' de MongoDb. (s'il n'existe pas déjà)
+exports.createOrUpdateProductByTextFile = async (req, res) => {
   const fetchedProductsTxtFilePath = './solusoft/ftpReceivedFiles/Produits/20240228_08271080_Produit.txt';
 
   try {
@@ -127,18 +127,19 @@ exports.createProductByTextFile = async (req, res) => {
     const productsToUpdate = []; // Tableau qui contient les produits à mettre à jour (m_eIDProduit est déjà présent dans la colleciton)
     const existingProductNumbers = new Set(); // Conserve les m_eIDProduit déjà existants dans la collection 'products' de MongoDB
 
-    // Vérifie les numéros de produit déjà existant avant de les insérer
-    for (const product of productsJsonData) { // Parcours tout les produits à l'intérieur du tableau productsJsonData. Crée une promesse avec retour pour chacun des produits trouvés
-      // findOne itère sur les produits et les trie en deux catégories : productsToUpdate (à modifier) et productsToInsert (à ajouter)
-      const existingProduct = await productSoluSoft.findOne({ m_eIDProduit: product.m_eIDProduit }); // findOne itère sur les produits dans l'objet JSON et vérifie pour chaque produit s'il existe déjà dans la collection 'products'. Si un produit avec le même attribut m_eIDProduit est trouvé, le produit est ajouté au tableau productsToUpdate. Sinon, il est ajouté au tableau productsToInsert.
-
+    /* 
+    FOR () Parcours tout les produits à l'intérieur du tableau productsJsonData et Crée une promesse avec retour pour chacun des produits trouvés
+    findOne() itère sur les produits et les trie en deux catégories : productsToUpdate (à modifier) ou productsToInsert (à ajouter)
+     */
+    for (const product of productsJsonData) { 
+      const existingProduct = await productSoluSoft.findOne({ m_eIDProduit: product.m_eIDProduit });
       if (!existingProduct) { // Si aucune concordance de l'attribut m_eIDProduit, le produit il devra être ajouté
         productsToInsert.push(product); // Ajouter le produit dans la liste des produit à ajouter (ToInsert).
-        console.warn(`Liste des IDProduit à ajouter (ToInsert): ${product.m_eIDProduit}`);
+        console.warn(`MongoDB: Liste des IDProduit à ajouter (ToInsert): ${product.m_eIDProduit}`);
       } else {
         productsToUpdate.push(product); // S'il ya  concordance de l'attribut m_eIDProduit, le produit il devra être ajouté mis à jour (ToUpdate).
         existingProductNumbers.add(product.m_eIDProduit);
-        console.warn(`Liste des IDProduit à modifié (ToUpdate): ${product.m_eIDProduit}`);
+        console.warn(`Liste des IDProduit à modifier (ToUpdate): ${product.m_eIDProduit}`);
       }
     }
 
@@ -156,17 +157,17 @@ exports.createProductByTextFile = async (req, res) => {
           }
         )
         // { $set: {  } })
-        console.log(`MongoDB Update Product: ${productsToUpdate.length} produit(s) modifié(s) avec succès.`);
+        console.log(`MongoDB: ${productsToUpdate.length} produit(s) modifié(s) avec succès.`);
       }
     } else {
-      console.log('MongoDB Update Product: Aucun produit déjà existant trouvé (aucune correspondance "m_eIDProduit").');
+      console.log('MongoDB: Aucun produit déjà existant trouvé (aucune correspondance "m_eIDProduit").');
 
     }
     if (productsToInsert.length > 0) { // FONCTION qui s'exécutera si le tableau de produits à a inséré n'est pas vide. (ligne 135)
       await productSoluSoft.insertMany(productsToInsert); // Ajoute les produts à ajouté (ToInsert) dans la collection 'products' de MongoDB
-      console.log(`MongoDB Insert Product: ${productsToInsert.length} produit(s) ajouté(s) avec succès.`);
+      console.log(`MongoDB: ${productsToInsert.length} produit(s) ajouté(s) avec succès.`);
     } else {
-      console.log('MongoDB Insert Product: Aucun nouveau produit trouvé (Correspondance "m_eIDProduit" déjà présent dans la base de donnée MongoDB).');
+      console.log('MongoDB: Aucun nouveau produit trouvé (Correspondance "m_eIDProduit" déjà présent dans la base de donnée MongoDB).');
     }
 
   }
