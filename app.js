@@ -81,7 +81,7 @@ mongoose
       console.log("Mongoose: Le serveur écoute sur le port 4242");
     });
     // cronScriptFtp est désactivé pour prévenir la multiplication des fichiers orders dans le dossier "parseOrdersFiles" et sur le serveur FTP.
-    // cronScriptFtp.ftpCronConnect(); // devra être déplacer dans cronScheduledTasks programmé 1x par heure: (0 */1 * * *)
+    // cronScriptFtp.ftpCronConnect(); // devra être déplacer dans cronScheduledTasks et programmé 1x par heure: (0 */1 * * *)
   })
   .catch((err) => {
     console.log("Mongoose: La connexion à la base de données a échoué", err);
