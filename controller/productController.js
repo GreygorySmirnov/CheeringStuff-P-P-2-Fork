@@ -186,6 +186,7 @@ exports.createOrUpdateProductByTextFile = async (req, res) => {
                   m_eIDCritereParent: product.m_eIDCritereParent,
                   m_tbCriteres: product.m_tbCriteres
 
+                  // CES ATTRIBUTS SONT DÉSACTIVÉS CAR ILS NE FONTIONNENT PAS POUR LE MOMENT
                   /* 
                                     
                                       {
@@ -210,6 +211,7 @@ exports.createOrUpdateProductByTextFile = async (req, res) => {
                   m_eIDCritereParent: product.m_eIDCritereParent,
                   m_tbCriteres: product.m_tbCriteres
 
+                  // CES ATTRIBUTS SONT DÉSACTIVÉS CAR ILS NE FONTIONNENT PAS POUR LE MOMENT
                   /* 
                                     [
                                       {
