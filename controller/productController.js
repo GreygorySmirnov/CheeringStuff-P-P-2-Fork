@@ -187,47 +187,47 @@ exports.createOrUpdateProductByTextFile = async (req, res) => {
                   m_tbCriteres: product.m_tbCriteres
 
                   /* 
-                  [
-                    {
-                      m_eIDCritere: product.m_eIDCritere,
-                      m_sDescFra: product.m_sDescFra,
-                      m_sDescAng: product.m_sDescAng,
-                      m_eOrdreAffich: product.m_eOrdreAffich,
-                      m_sCodeCritere: product.m_sCodeCritere
-                    },
-                    {
-                      m_eIDCritere: product.m_eIDCritere,
-                      m_sDescFra: product.m_sDescFra,
-                      m_sDescAng: product.m_sDescAng,
-                      m_eOrdreAffich: product.m_eOrdreAffich,
-                      m_sCodeCritere: product.m_sCodeCritere
-                    }
-                  ]
- */
+                                    
+                                      {
+                                        m_eIDCritere: product.m_eIDCritere,
+                                        m_sDescFra: product.m_sDescFra,
+                                        m_sDescAng: product.m_sDescAng,
+                                        m_eOrdreAffich: product.m_eOrdreAffich,
+                                        m_sCodeCritere: product.m_sCodeCritere
+                                      },
+                                      {
+                                        m_eIDCritere: product.m_eIDCritere,
+                                        m_sDescFra: product.m_sDescFra,
+                                        m_sDescAng: product.m_sDescAng,
+                                        m_eOrdreAffich: product.m_eOrdreAffich,
+                                        m_sCodeCritere: product.m_sCodeCritere
+                                      }
+                                    
+                   */
 
                 },
                 {
                   m_eIDCritereParent: product.m_eIDCritereParent,
                   m_tbCriteres: product.m_tbCriteres
 
-/* 
-                  [
-                    {
-                      m_eIDCritere: product.m_eIDCritere,
-                      m_sDescFra: product.m_sDescFra,
-                      m_sDescAng: product.m_sDescAng,
-                      m_eOrdreAffich: product.m_eOrdreAffich,
-                      m_sCodeCritere: product.m_sCodeCritere
-                    },
-                    {
-                      m_eIDCritere: product.m_eIDCritere,
-                      m_sDescFra: product.m_sDescFra,
-                      m_sDescAng: product.m_sDescAng,
-                      m_eOrdreAffich: product.m_eOrdreAffich,
-                      m_sCodeCritere: product.m_sCodeCritere
-                    }
-                  ]
- */
+                  /* 
+                                    [
+                                      {
+                                        m_eIDCritere: product.m_eIDCritere,
+                                        m_sDescFra: product.m_sDescFra,
+                                        m_sDescAng: product.m_sDescAng,
+                                        m_eOrdreAffich: product.m_eOrdreAffich,
+                                        m_sCodeCritere: product.m_sCodeCritere
+                                      },
+                                      {
+                                        m_eIDCritere: product.m_eIDCritere,
+                                        m_sDescFra: product.m_sDescFra,
+                                        m_sDescAng: product.m_sDescAng,
+                                        m_eOrdreAffich: product.m_eOrdreAffich,
+                                        m_sCodeCritere: product.m_sCodeCritere
+                                      }
+                                    ]
+                   */
 
                 }
               ]
@@ -238,8 +238,8 @@ exports.createOrUpdateProductByTextFile = async (req, res) => {
       }
     } else {
       console.log('MongoDB: Aucun produit déjà existant trouvé (aucune correspondance "m_eIDProduit").');
-
     }
+
     if (productsToInsert.length > 0) { // FONCTION qui s'exécutera si le tableau de produits à a inséré n'est pas vide. (ligne 135)
       await productSoluSoft.insertMany(productsToInsert); // Ajoute les produts à ajouté (ToInsert) dans la collection 'products' de MongoDB
       console.log(`MongoDB: ${productsToInsert.length} produit(s) ajouté(s) avec succès.`);
