@@ -6,9 +6,9 @@ exports.createSolusoftRootFolder = async (req, res) => {
     if (!fs.existsSync(solusoftFolder)) {
         // CRÉATION DU DOSSIER RACINE "Solusoft" LOCAL s'il n'existe pas déjà
         fs.mkdirSync(solusoftFolder, { recursive: true });
-        console.log("Le dossier local 'solusoftFolder' a été créé.");
+        console.log("FileSystem: Le dossier local 'solusoftFolder' a été créé.");
     } else {
-        console.log("Le dossier local 'solusoftFolder' existe déjà.");
+        console.log("FileSystem: Le dossier local 'solusoftFolder' est déjà présent!");
     }
 
 }
@@ -21,9 +21,9 @@ exports.createProductsFolder = async (req, res) => {
     if (!fs.existsSync(localReceivedFilesProduits)) {
         // CRÉATION DU DOSSIER "PRODUITS" LOCAL s'il n'existe pas déjà
         fs.mkdirSync(localReceivedFilesProduits, { recursive: true });
-        console.log("Le dossier local 'ftpReceivedFiles/Produits' a été créé.");
+        console.log("FileSystem: Le dossier local 'ftpReceivedFiles/Produits' a été créé.");
     } else {
-        console.log("Le dossier local 'ftpReceivedFiles/Produits' existe déjà.");
+        console.log("FileSystem: Le dossier local 'ftpReceivedFiles/Produits' est déjà présent!");
     }
 }
 
@@ -35,8 +35,8 @@ exports.createPhotosFolder = async (req, res) => {
     if (!fs.existsSync(localReceivedFilesPhotos)) {
         // CRÉATION DU DOSSIER "PHOTOS" LOCAL s'il n'existe pas déjà
         fs.mkdirSync(localReceivedFilesPhotos, { recursive: true });
-        console.log("Le dossier local 'ftpReceivedFiles/Photos' a été créé.");
+        console.log("FileSystem: Le dossier local 'ftpReceivedFiles/Photos' a été créé.");
     } else {
-        console.log("Le dossier local 'ftpReceivedFiles/Photos' existe déjà.");
+        console.log("FileSystem: Le dossier local 'ftpReceivedFiles/Photos' est déjà présent!");
     }
 }

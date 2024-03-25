@@ -18,14 +18,14 @@ exports.extractZipPhotosFiles = async (req, res) => {
                 try {
                     const zip = new AdmZip(compressedPhotosPath);
                     await zip.extractAllTo(uncompressedPhotosDir, true); // Extract all entries to uncompressedPhotosDir
-                    console.log(`Fichiers extraits: ${compressedPhotosPath}`);
+                    console.log(`AdmZip: Liste des fichiers photos extraits: ${compressedPhotosPath}`);
                 } catch (err) {
-                    console.error(`Error extracting ${compressedPhotosPath}:`, err);
+                    console.error(`AdmZip: Erreur d'extraction: ${compressedPhotosPath}:`, err);
                 }
             }
         }
 
-        console.log("TOUS les fichiers photos compressés ont été extrait (S'il y a des fichiers zip présents).");
+        console.log("AdmZip: Tous les fichiers photos compressés ont été extrait (S'il y a des fichiers zip présents).");
     } catch (err) {
         console.error('Erreur lors de la lecture du dossier source:', err);
     }

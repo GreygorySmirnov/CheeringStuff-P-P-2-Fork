@@ -1,5 +1,5 @@
 // Function FTP Connexion / Download / Download
-exports.fetchProductsAndPhotosFromFtpDaily = (req, res) => {
+exports.fetchProductsAndPhotosFromFtpDaily = async (req, res) => {
     // MODULES DE DÉPENDANCES NODE.JS (importation)
     const cron = require('node-cron'); // Planificateur de tâches CRON
     const ftpController = require('../controller/ftpController') // Importe les fonctions du ftpController ()
