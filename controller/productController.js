@@ -116,39 +116,141 @@ exports.getProductById = (req, res) => {
 };
 
 
-// createProductByTextFile: Création d'un nouveau produit dans la collection 'products' de MongoDb. (s'il n'existe pas déjà)
-exports.createProductByTextFile = async (req, res) => {
-  const productTextFilePath = './solusoft/ftpReceivedFiles/Produits/20240228_08271080_Produit.txt';
+// Création ou modification d'un nouveau produit dans la collection 'products' de MongoDb. (s'il n'existe pas déjà)
+exports.createOrUpdateProductByTextFile = async (req, res) => {
+  const fetchedProductsTxtFilePath = './solusoft/ftpReceivedFiles/Produits/20240228_08271080_Produit.txt';
 
   try {
-    // Fonction qui lit et converti en JSON les produits téléchargés en format txt contenu dans le dossier de réception.
-    const productDataText = JSON.parse(fs.readFileSync(productTextFilePath, 'utf8'));
+    let parseProductTxtFile = fs.readFileSync(fetchedProductsTxtFilePath, 'utf8')
+    const productsJsonData = JSON.parse(parseProductTxtFile); // readFileSync (module FS): analyse le fichier *produit.txt et convertit objet JSON
+    const productsToInsert = []; // Tableau qui contient les produits sans les dupliquer (m_eIDProduit n'est pas déjà présent dans la collection)
+    const productsToUpdate = []; // Tableau qui contient les produits à mettre à jour (m_eIDProduit est déjà présent dans la colleciton)
+    const existingProductNumbers = new Set(); // Conserve les m_eIDProduit déjà existants dans la collection 'products' de MongoDB
 
-    const productsToInsert = []; // Tableau qui contient les produits sans les dupliquer
-    const existingProductNumbers = new Set(); // Set pour conserver/enregistré les numéros de produits existant || Configurer pour stocker des numéros de produits existants uniques
-
-    // Vérifie les numéros de produit déjà existant avant de les insérer
-    await Promise.all(productDataText.map(async (product) => {
-      const existingProduct = await productSoluSoft.findOne({ m_sNoProduit: product.m_sNoProduit });
-      if (!existingProduct) {
-        productsToInsert.push(product);
+    /* 
+    FOR () Parcours tout les produits à l'intérieur du tableau productsJsonData et Crée une promesse avec retour pour chacun des produits trouvés
+    findOne() itère sur les produits et les trie en deux catégories : productsToUpdate (à modifier) ou productsToInsert (à ajouter)
+     */
+    for (const product of productsJsonData) {
+      const existingProduct = await productSoluSoft.findOne({ m_eIDProduit: product.m_eIDProduit });
+      if (!existingProduct) { // Si aucune concordance de l'attribut m_eIDProduit, le produit il devra être ajouté
+        productsToInsert.push(product); // Ajouter le produit dans la liste des produit à ajouter (ToInsert).
+        console.warn(`MongoDB: Liste des IDProduit à ajouter (ToInsert): ${product.m_eIDProduit}`);
       } else {
-        // LES PRODUITS DÉJÀ EXISTANT DOIVENT ÊTRE UPDATER!!!!!!!
-        existingProductNumbers.add(product.m_sNoProduit);
-        console.warn(`MongoDB: Les produits avec l'attribut m_sNoProduit en double seront ignorés: ${product.m_sNoProduit}`);
+        productsToUpdate.push(product); // S'il ya  concordance de l'attribut m_eIDProduit, le produit il devra être ajouté mis à jour (ToUpdate).
+        existingProductNumbers.add(product.m_eIDProduit);
+        console.warn(`MongoDB: Liste des IDProduit à modifier (ToUpdate): ${product.m_eIDProduit}`);
       }
-    }));
-
-    if (productsToInsert.length > 0) {
-      // Insère les produits sans duplication de l'attribut m_sNoProduit.
-      // Fonction mongoose qui qppelle le nouveau modèle/schema de produits pour effectuer l'opération insertMany (ajouter).
-      // Ces produits parseJSON seront ajoutés dans la collection 'products' de mongoDb avec l'ensemble de leurs attrituts recueillit dans productDataText.
-      await productSoluSoft.insertMany(productsToInsert);
-      console.log(`MongoDB: ${productsToInsert.length} produit(s) inséré(s) avec succès.`);
-    } else {
-      console.log('MongoDB: Aucun nouveau produit trouvé (Leurs attributs "m_sNoProduit" existe déjà dans la base de donnée MongoDB).');
     }
-  } catch (error) {
-    console.error("Erreur lors du traitement des données produit:", error);
+
+    if (productsToUpdate.length > 0) {
+
+      for (let product of productsToUpdate) {
+        // console.log(product)
+        await productSoluSoft.updateOne({ m_eIDProduit: product.m_eIDProduit },
+          // Détermine (set) les attributs qui doivent être modifiés
+          {
+            $set:
+            {
+              m_sNoProduit: product.m_sNoProduit,
+              m_sDescFra: product.m_sDescFra, // Description Française
+              m_sDescAng: product.m_sDescAng, // Description Anglaise
+              m_sTypeProduit: product.m_sTypeProduit,
+              m_eIDProdModele: product.m_eIDProdModele,
+              m_sCodeCat: product.m_sCodeCat,
+              m_sDescFraCat: product.m_sDescFraCat,
+              m_sDescAngCat: product.m_sDescAngCat,
+              m_sCodeSousCat: product.m_sCodeSousCat,
+              m_sDescSsFraCat: product.m_sDescSsFraCat,
+              m_sDescSsAngCat: product.m_sDescSsAngCat,
+              m_bTaxableTPS: product.m_bTaxableTPS,
+              m_bTaxableTVQ: product.m_bTaxableTVQ,
+              m_mPrix: product.m_mPrix,
+              m_mPrixEnSolde: product.m_mPrixEnSolde,
+              m_mQuantite: product.m_mQuantite,
+              m_nPoids: product.m_nPoids,
+              m_sNoteTechFra: product.m_sNoteTechFra,
+              m_sNoteTechAng: product.m_sNoteTechAng,
+              m_tbCategories: product.m_tbCategories
+              [{}
+              ],
+              m_tbSpecifications: product.m_tbSpecifications
+              [{}
+              ],
+              m_tbGroupe: product.m_tbGroupe
+              [{}
+              ],
+              m_tbCaracteristiques: product.m_tbCaracteristiques
+              [
+                {
+                  m_eIDCritereParent: product.m_eIDCritereParent,
+                  m_tbCriteres: product.m_tbCriteres
+
+                  // CES ATTRIBUTS SONT DÉSACTIVÉS CAR ILS NE FONTIONNENT PAS POUR LE MOMENT
+                  /* 
+                                    
+                                      {
+                                        m_eIDCritere: product.m_eIDCritere,
+                                        m_sDescFra: product.m_sDescFra,
+                                        m_sDescAng: product.m_sDescAng,
+                                        m_eOrdreAffich: product.m_eOrdreAffich,
+                                        m_sCodeCritere: product.m_sCodeCritere
+                                      },
+                                      {
+                                        m_eIDCritere: product.m_eIDCritere,
+                                        m_sDescFra: product.m_sDescFra,
+                                        m_sDescAng: product.m_sDescAng,
+                                        m_eOrdreAffich: product.m_eOrdreAffich,
+                                        m_sCodeCritere: product.m_sCodeCritere
+                                      }
+                                    
+                   */
+
+                },
+                {
+                  m_eIDCritereParent: product.m_eIDCritereParent,
+                  m_tbCriteres: product.m_tbCriteres
+
+                  // CES ATTRIBUTS SONT DÉSACTIVÉS CAR ILS NE FONTIONNENT PAS POUR LE MOMENT
+                  /* 
+                                    [
+                                      {
+                                        m_eIDCritere: product.m_eIDCritere,
+                                        m_sDescFra: product.m_sDescFra,
+                                        m_sDescAng: product.m_sDescAng,
+                                        m_eOrdreAffich: product.m_eOrdreAffich,
+                                        m_sCodeCritere: product.m_sCodeCritere
+                                      },
+                                      {
+                                        m_eIDCritere: product.m_eIDCritere,
+                                        m_sDescFra: product.m_sDescFra,
+                                        m_sDescAng: product.m_sDescAng,
+                                        m_eOrdreAffich: product.m_eOrdreAffich,
+                                        m_sCodeCritere: product.m_sCodeCritere
+                                      }
+                                    ]
+                   */
+
+                }
+              ]
+            }
+          }
+        )
+        console.log(`MongoDB: ${productsToUpdate.length} produit(s) modifié(s) avec succès.`);
+      }
+    } else {
+      console.log('MongoDB: Aucun produit déjà existant trouvé (aucune correspondance "m_eIDProduit").');
+    }
+
+    if (productsToInsert.length > 0) { // FONCTION qui s'exécutera si le tableau de produits à a inséré n'est pas vide. (ligne 135)
+      await productSoluSoft.insertMany(productsToInsert); // Ajoute les produts à ajouté (ToInsert) dans la collection 'products' de MongoDB
+      console.log(`MongoDB: ${productsToInsert.length} produit(s) ajouté(s) avec succès.`);
+    } else {
+      console.log('MongoDB: Aucun nouveau produit trouvé (Correspondance "m_eIDProduit" déjà présent dans la base de donnée MongoDB).');
+    }
+
   }
-};
+  catch (error) {
+    console.error("Erreur lors du traitement des données du fichier JSON (date)_(heure)_Produit.txt", error);
+  }
+}
